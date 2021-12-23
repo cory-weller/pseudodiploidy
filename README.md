@@ -68,4 +68,4 @@ Rscript src/heatmap.R
 # Run exploratory analyses
 ```
 singularity run -H $PWD:/home src/R.sif
-```# pseudo
+```
