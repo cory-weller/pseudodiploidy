@@ -19,7 +19,7 @@ wget -O R.sif "https://onedrive.live.com/download?cid=77DD71E598E5B51B&resid=77D
 
 ## Retrieve data
 ```
-bash src/getData.sh
+bash src/get-data.sh
 ```
 
 ## Transform data
