@@ -20,7 +20,7 @@ runContrast <- function(dds, group1, group2) {
                 coef = paste('condition_', group2, '_vs_', group1, sep=''),
                 type = 'apeglm'
     )
-    return(as.data.table(res))
+    return(as.data.table(res, keep.rownames="geneID"))
 }
 
 # Load in DESeq2 data set (DDS) object
