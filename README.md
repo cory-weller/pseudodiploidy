@@ -27,9 +27,9 @@ bash src/getData.sh
 # Build count matrix for DESeq
 singularity exec -H $PWD:/home src/R.sif Rscript \
     src/buildCountMatrix.R \
-    data/input/combined_featurecounts.csv \
+    data/input/combined-featurecounts.csv \
     data/input/samples.csv \
-    data/processed/featurecounts.mat.RDS
+    data/processed/featurecounts-mat.RDS
 
 # Build TPM table for other analyses
 singularity exec -H $PWD:/home src/R.sif Rscript \
@@ -40,7 +40,7 @@ singularity exec -H $PWD:/home src/R.sif Rscript \
 
 # Build DESeq Data Set (DDS) Object
 singularity exec -H $PWD:/home src/R.sif Rscript \
-    src/buildDDS.R \
+    src/build-DDS.R \
     data/processed/featurecounts.mat.RDS \
     data/input/samples.csv \
     data/processed/DDS.RDS

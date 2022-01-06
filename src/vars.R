@@ -1,6 +1,6 @@
 
-featureCountsCsvFilename <- 'data/input/combined_featurecounts.csv'
+featureCountsCsvFilename <- 'data/input/combined-featurecounts.csv'
 coldataFilename <- 'data/input/samples.csv'
-featureCountMatrixFilename <-'data/processed/featurecounts.mat.RDS'
+featureCountMatrixFilename <-'data/processed/featurecounts-matrix.RDS'
 DESeqDdsFilename <- 'data/processed/DDS.RDS'
-SgdFeaturesFilename <- 'data/external/SGD_features.tab'
+SgdFeaturesFilename <- 'data/external/SGD-features.tab'

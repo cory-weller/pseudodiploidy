@@ -22,7 +22,7 @@ getData () {
 }
 
 getData \
-    "data/external/SGD_features.tab" \
+    "data/external/SGD-features.tab" \
     "http://sgd-archive.yeastgenome.org/curation/chromosomal_feature/SGD_features.tab" \
     "cc3c54abb0106993b4d09227f4748e46460b4a7614518b6513863d7c175d9e9bdde773a676729437f7c2cba622cc40c98dbc83bf38b84149e05aedf056639373"
 
