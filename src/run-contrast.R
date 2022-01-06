@@ -26,9 +26,20 @@ runContrast <- function(dds, group1, group2) {
 # Load in DESeq2 data set (DDS) object
 dds <- readRDS(DESeqDdsFilename)
 
-nam.v.pseudo <- runContrast(dds, "a_nam", "a_pseudo")
+group1 <- "a_nam"
+group2 <- "a_pseudo"
+
+expressionContrast <- runContrast(dds, "group1", "group2")
 
 
+
+
+
+
+
+
+
+# TODO: Code below to merge in SGD features
 # get features file from SGD
 SgdFeatures <- fread(SgdFeaturesFilename, header = FALSE)
 SgdFeatures <- SgdFeatures[,c("V4","V1")]
