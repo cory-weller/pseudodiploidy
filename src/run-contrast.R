@@ -29,7 +29,7 @@ dds <- readRDS(DESeqDdsFilename)
 group1 <- "a_nam"
 group2 <- "a_pseudo"
 
-expressionContrast <- runContrast(dds, "group1", "group2")
+expressionContrast <- runContrast(dds, group1, group2)
 
 
 
