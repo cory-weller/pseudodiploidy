@@ -3,7 +3,7 @@
 ## Singularity
 ### Install Singularity
 ```
-bash src/install_singularity.sh
+bash src/install-singularity.sh
 ```
 
 ### Build Singularity image
@@ -51,21 +51,6 @@ singularity exec -H $PWD:/home src/R.sif Rscript \
 # by starting R session:
 ./R.sh
 
-```
-
-
-## Run DESeq
-```
-Rscript src/runDESeq.R \
-    data/input/combined_featurecounts.csv \
-    data/input/samples.csv \
-    data/processed/featurecounts.mat.RDS
-    data/processed/pseudohaploid_DEseq_dds.RDS
-```
-
-# Build heatmap
-```
-Rscript src/heatmap.R
 ```
 
 # Run exploratory analyses
