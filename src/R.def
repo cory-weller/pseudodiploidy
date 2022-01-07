@@ -25,7 +25,8 @@ From: ubuntu:focal
         g++ \
         curl \
         libxml2 \
-        libxml2-dev
+        libxml2-dev \
+        xauth
     
     # libopenmpi-dev openmpi-bin openmpi-common openmpi-doc openssh-client openssh-server libssh-dev wget vim git nano git cmake  gfortran g++ curl wget python autoconf bzip2 libtool libtool-bin python-pip python-dev
 
