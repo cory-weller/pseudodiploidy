@@ -25,21 +25,21 @@ bash src/get-data.sh
 ## Transform data
 ```
 # Build count matrix for DESeq
-singularity exec -H $PWD:/home src/R.sif Rscript \
+singularity exec --bind ${PWD} src/R.sif Rscript \
     src/build-count-matrix.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/featurecounts-matrix.RDS
 
 # Build TPM table for other analyses
-singularity exec -H $PWD:/home src/R.sif Rscript \
+singularity exec --bind ${PWD} src/R.sif Rscript \
     src/build-TPM-table.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/TPM.txt.gz
 
 # Build DESeq Data Set (DDS) Object
-singularity exec -H $PWD:/home src/R.sif Rscript \
+singularity exec --bind ${PWD} src/R.sif Rscript \
     src/build-DDS.R \
     data/processed/featurecounts-matrix.RDS \
     data/input/samples.csv \
@@ -55,5 +55,5 @@ singularity exec -H $PWD:/home src/R.sif Rscript \
 
 # Run exploratory analyses
 ```
-singularity run -H $PWD:/home src/R.sif
+singularity exec --bind ${PWD} src/R.sif R
 ```
