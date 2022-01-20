@@ -46,11 +46,8 @@ singularity exec --bind ${PWD} src/R.sif Rscript \
     data/processed/DDS.RDS
 
 # Run differential expression contrasts
-# using src/run-contrast.R
-# (run manually in R for now)
-# by starting R session:
-./R.sh
-
+singularity exec --bind ${PWD} src/R.sif Rscript \
+    src/run-contrast.R
 ```
 
 # Run exploratory analyses
