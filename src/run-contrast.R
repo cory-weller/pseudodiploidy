@@ -40,6 +40,8 @@ for(i in 1:nContrasts) {
     group2 <- contrasts[i,V2]
 
     expressionContrast <- runContrast(dds, group1, group2)
+    # correct contrast direction
+    expressionContrast[, log2FoldChange := -1*log2FoldChange]
 
     # add isSignif column, where TRUE if log2FoldChange and padj pass threshold
     expressionContrast[, isSignif := FALSE]
@@ -57,6 +59,7 @@ for(i in 1:nContrasts) {
     signifDEgenes[, 'group2' := group2]
     
     DEgenes <- rbindlist(list(DEgenes, signifDEgenes))
+    backgroundStrain <- unlist(strsplit(group1, '_'))[1]
 
     g <- ggplot(data=expressionContrast, 
             aes(
@@ -66,6 +69,7 @@ for(i in 1:nContrasts) {
             )
         ) + 
         geom_point(shape=21, color=expressionContrast$plotColor) +
+        labs(x=paste('log2 fold change in ', group1, ' relative to haploid ', backgroundStrain, sep='')) +
         theme_few(12) +
         guides(alpha='none') +
         guides(color='none') +
