@@ -1,3 +1,7 @@
 *.RDS
 *.sif
 *.png
+*.vcf.gz
+*.tab
+*.tbi
+chr*.tsv
