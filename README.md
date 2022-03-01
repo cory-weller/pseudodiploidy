@@ -8,14 +8,9 @@ bash src/install-singularity.sh
 
 ### Build Singularity image
 ```
-singularity build --fakeroot src/R.sif src/R.def
+singularity build --fakeroot src/pseudodiploidy.sif src/pseudodiploidy.def
 ```
 
-### Upload Singularity Image 
-`R.sif` uploaded to OneDrive, which can be downloaded with:
-```
-wget -O R.sif "https://onedrive.live.com/download?cid=77DD71E598E5B51B&resid=77DD71E598E5B51B%2119114&authkey=AH63WVNezJbyWqM" 
-```
 
 ## Retrieve data
 ```
