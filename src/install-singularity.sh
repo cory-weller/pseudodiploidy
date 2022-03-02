@@ -36,3 +36,5 @@ git checkout v3.8.4
 cd ./builddir
 make
 sudo make install
+
+rm -rf singularity/
