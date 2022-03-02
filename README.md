@@ -1,22 +1,31 @@
-# Yeast Pseudodiploidy
+# Yeast Strain Barcoding
 
-## Singularity
-### Install Singularity
+## Activate OR install Singularity
 ```
+# install on your system if you have sudo
 bash src/install-singularity.sh
-```
 
-### Build Singularity image
+# activate module, e.g. on HPC
+module load singularity
 ```
-singularity build --fakeroot src/pseudodiploidy.sif src/pseudodiploidy.def
-```
-
 
 ## Retrieve data
 ```
 bash src/get-data.sh
 ```
 
+## Check windows for strain uniqueness
+```
+# run as
+# src/query-region.sh <chromosome> <startPos> <endPos>
+# e.g.:
+src/query-region.sh 2 80000 81000
+
+# results written to reports/ as chr#-start-stop.tsv
+```
+
+
+# Yeast Pseudodiploidy
 ## Transform data
 ```
 # Build count matrix for DESeq
