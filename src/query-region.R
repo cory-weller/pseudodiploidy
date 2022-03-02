@@ -16,6 +16,7 @@ headerText <- colnames(fread('data/input/vcf-header.txt'))
 chromosome <- args[1]
 start <- args[2]
 stop <- args[3]
+replicates <- as.numeric(args[4])
 
 
 importGenotypes <- function(chromosome, start, stop) {
@@ -79,7 +80,11 @@ matingTypes <- fread('data/external/mating-types.tsv')
 matingTypes <- matingTypes[Mating %in% c('a','b')]
 
 
-output <- testRegion(matingTypes, chromosome, start, stop)
+output <- foreach(i=1:replicates, .combine='rbind') %do% {                                        
+    o <- testRegion(matingTypes, chromosome, start, stop)
+    o[, 'i' := i]
+    return(o[])
+}    
 
 fwrite(output, file=paste('reports/', 'chr', chromosome, '-', start, '-', stop, '.tsv', sep=''), quote=F, col.names=T, row.names=F, sep="\t")
 
