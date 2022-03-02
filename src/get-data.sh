@@ -46,3 +46,8 @@ getFile \
     "https://onedrive.live.com/download?cid=77DD71E598E5B51B&resid=77DD71E598E5B51B%2119158&authkey=AEMV-omDAGOoe7U"  \
     "b3abea664cf2835b2451dc9649739aa3b392723e9cdb5188ff1edcd31c399a785254dfc9a3d6098ceb221ce3cd6ba0bc7863109be8111df54d914e823dbb2606"
     # Zipfile containing S288C vcfs, bgzipped and indexed by tabix
+
+
+# extract tabix-ready vcf files and remove zip file
+unzip data/external/S288C.vcf.zip -d data/external/ && rm data/external/S288C.vcf.zip
+
