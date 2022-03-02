@@ -11,7 +11,7 @@ options(scipen=999)
 
 args <- commandArgs(trailingOnly = TRUE)
 
-headerText <- colnames(fread('data/header.txt'))
+headerText <- colnames(fread('data/input/vcf-header.txt'))
 
 chromosome <- args[1]
 start <- args[2]
@@ -19,7 +19,7 @@ stop <- args[3]
 
 
 importGenotypes <- function(chromosome, start, stop) {
-    vcfFilename <- paste('data/genomes/chromosome', chromosome, '.vcf.gz', sep='')
+    vcfFilename <- paste('data/external/chromosome', chromosome, '.vcf.gz', sep='')
     tabixCommand <- paste('tabix ', vcfFilename, ' chromosome',chromosome, ':', start, '-', stop, sep='')
     genotypes <- fread(cmd=tabixCommand)
     if(nrow(genotypes) == 0) {
@@ -75,7 +75,7 @@ testRegion <- function(matingTypes, chromosome, start, stop) {
 }
 
 
-matingTypes <- fread('data/mating-types.tsv')
+matingTypes <- fread('data/external/mating-types.tsv')
 matingTypes <- matingTypes[Mating %in% c('a','b')]
 
 
