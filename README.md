@@ -17,9 +17,9 @@ bash src/get-data.sh
 ## Check windows for strain uniqueness
 ```
 # run as
-# src/query-region.sh <chromosome> <startPos> <endPos>
+# src/query-region.sh <chromosome> <startPos> <endPos> <nReplicates>
 # e.g.:
-src/query-region.sh 2 80000 81000
+src/query-region.sh 2 80000 81000 10
 
 # results written to reports/ as chr#-start-stop.tsv
 ```
