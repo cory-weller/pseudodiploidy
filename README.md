@@ -24,6 +24,16 @@ src/query-region.sh 2 80000 81000 10
 # results written to reports/ as chr#-start-stop.tsv
 ```
 
+## Print regions of interest
+```
+# print to terminal
+bash src/print-region.sh 2 80000 81000
+
+# print to file
+bash src/print-region-to-file.sh 2 80000 81000 
+
+```
+
 
 # Yeast Pseudodiploidy
 ## Transform data
