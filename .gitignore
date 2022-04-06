@@ -5,3 +5,6 @@
 *.tab
 *.tbi
 chr*.tsv
+*.fsa.gz
+*.fsa
+*.fasta
