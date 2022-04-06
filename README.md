@@ -117,3 +117,35 @@ singularity exec src/singularity.sif tabix genomes/chromosome1.vcf.gz chromosome
 # test region
 
 singularity exec src/singularity.sif Rscript stuff.R 1 500 1000
+
+
+# Finding putative guides
+Retrieve S288C Reference genome
+```
+rclone copy nihbox:/cloud/S288C/S288C_reference_sequence_R64-3-1_20210421.fsa.gz data/external/ && \
+gunzip data/external/S288C_reference_sequence_R64-3-1_20210421.fsa.gz
+```
+
+Extract just chromosome 12
+```
+grep -n 'chromosome=XII' data/external/S288C_reference_sequence_R64-3-1_20210421.fsa
+```
+Which returns output:
+```
+120768:>ref|NC_001144| [org=Saccharomyces cerevisiae] [strain=S288C] [moltype=genomic] [chromosome=XII]
+138739:>ref|NC_001145| [org=Saccharomyces cerevisiae] [strain=S288C] [moltype=genomic] [chromosome=XIII]
+```
+
+So we want lines 120768:138738 (17971 lines):
+```
+head -n 138738 data/external/S288C_reference_sequence_R64-3-1_20210421.fsa | tail -n 17971 > data/external/S288C-chr12.fasta
+```
+
+Extract variable sites:
+```
+zcat data/external/chromosome12.vcf.gz | awk '{print $2}' > data/processed/S288C-chr12-variable-sites.txt
+```
+Find all guides
+```
+python3 src/find-guides.py > data/processed/chr12-guides.tsv
+```
