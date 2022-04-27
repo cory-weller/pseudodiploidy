@@ -149,3 +149,11 @@ Find all guides
 ```
 python3 src/find-guides.py > data/processed/chr12-guides.tsv
 ```
+chr12:171320-172320
+
+singularity exec ../pseudodiploidy/src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/input/type-a-strains.txt 12 171320 172320 > varSites-a.txtR
+
+vcf         data/external/chromosome12.vcf.gz
+strains     data/input/type-a-strains.txt
+strains     data/input/type-b-strains.txt
+chromosome  12

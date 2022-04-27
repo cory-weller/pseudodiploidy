@@ -16,7 +16,7 @@ with open('data/external/S288C-chr12.fasta', 'r') as infile:
 
 fasta = list(fasta)
 
-with open('data/processed/S288C-chr12-variable-sites.txt', 'r') as infile:
+with open('varSites-a.txt', 'r') as infile:
     sites = [int(x.strip()) - 1 for x in infile.readlines()]
 
 
