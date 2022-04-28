@@ -13,10 +13,14 @@ args <- commandArgs(trailingOnly = TRUE)
 
 headerText <- colnames(fread('data/input/vcf-header.txt'))
 
-chromosome <- args[1]
-start <- args[2]
-stop <- args[3]
-replicates <- as.numeric(args[4])
+strainsFile <- args[1]
+chromosome <- args[2]
+start <- args[3]
+stop <- args[4]
+replicates <- as.numeric(args[5])
+
+strainsToUse <- fread(strainsFile, header=FALSE)$V1
+print(strainsToUse)
 
 
 importGenotypes <- function(chromosome, start, stop) {
@@ -27,7 +31,10 @@ importGenotypes <- function(chromosome, start, stop) {
         return(NULL)
     }
     setnames(genotypes, headerText)
-    strainNames <- colnames(genotypes)[10:ncol(genotypes)]
+    strainNames <- strainsToUse
+    infoCols <- colnames(genotypes)[1:9]
+    keptCols <- c(infoCols, strainsToUse)
+    genotypes <- genotypes[, keptCols, with=F]
     # modify genotypes to factors then to numeric
     # anything that isn't '0/0' or '1/1' becomes NA
     genotypes <- genotypes[, (strainNames) := lapply(.SD, function(x) factor(x, levels=c('0/0', '1/1'))), .SDcols=strainNames][]
@@ -77,7 +84,7 @@ testRegion <- function(matingTypes, chromosome, start, stop) {
 
 
 matingTypes <- fread('data/external/mating-types.tsv')
-matingTypes <- matingTypes[Mating %in% c('a','b')]
+matingTypes <- matingTypes[Mating %in% c('a','b') & Standardized_name %in% strainsToUse]
 
 
 output <- foreach(i=1:replicates, .combine='rbind') %do% {                                        

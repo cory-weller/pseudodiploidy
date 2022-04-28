@@ -17,9 +17,9 @@ bash src/get-data.sh
 ## Check windows for strain uniqueness
 ```
 # run as
-# src/query-region.sh <chromosome> <startPos> <endPos> <nReplicates>
+# src/query-region.sh <strains-to-use> <chromosome> <startPos> <endPos> <nReplicates>
 # e.g.:
-src/query-region.sh 2 80000 81000 10
+src/query-region.sh data/input/strains-to-start-with.txt 12 171320 172320 10
 
 # results written to reports/ as chr#-start-stop.tsv
 ```
@@ -113,10 +113,6 @@ rclone copy ${remotedata}:/S288C/vcf/ data/genomes/
 
 # extract regions from vcf
 singularity exec src/singularity.sif tabix genomes/chromosome1.vcf.gz chromosome1:1-100
-
-# test region
-
-singularity exec src/singularity.sif Rscript stuff.R 1 500 1000
 
 
 # Finding putative guides
