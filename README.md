@@ -14,14 +14,29 @@ module load singularity
 bash src/get-data.sh
 ```
 
-## Check windows for strain uniqueness
+## Check windows for strain uniqueness for first and second pass
 ```
-# run as
-# src/query-region.sh <strains-to-use> <chromosome> <startPos> <endPos> <nReplicates>
-# e.g.:
-src/query-region.sh data/input/strains-to-start-with.txt 12 171320 172320 10
+# edit data/input/strains-to-start-with.txt
+# which includes the starting set of possible strains to consider
 
-# results written to reports/ as chr#-start-stop.tsv
+chromosome=12
+start=171320
+end=172320
+replicates=1
+
+# get strains for first pass
+src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
+mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
+
+# extract strains identified in the first pass
+
+awk 'NR==2 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' > data/input/first-pass-strains.txt
+awk 'NR==3 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' >> data/input/first-pass-strains.txt
+
+python3 src/get-second-pass-strains.py
+
+src/query-region.sh data/input/second-pass-strains.txt ${chromosome} ${start} ${end} ${replicates} && \
+mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.secondpass.tsv
 ```
 
 ## Print regions of interest
@@ -31,7 +46,6 @@ bash src/print-region.sh 2 80000 81000
 
 # print to file
 bash src/print-region-to-file.sh 2 80000 81000 
-
 ```
 
 
