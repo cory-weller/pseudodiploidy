@@ -7,6 +7,7 @@ library(ggplot2)
 registerDoMC(cores=4)
 
 options(scipen=999)
+set.seed(1)
 
 
 args <- commandArgs(trailingOnly = TRUE)

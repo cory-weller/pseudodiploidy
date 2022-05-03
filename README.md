@@ -38,18 +38,18 @@ rm reports/chr${chromosome}-${start}-${end}.tsv
 
 ## Remove following?
 # get strains for first pass
-src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
-mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
+# src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
+# mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
 
 # extract strains identified in the first pass
 
-awk 'NR==2 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' > data/input/first-pass-strains.txt
-awk 'NR==3 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' >> data/input/first-pass-strains.txt
+# awk 'NR==2 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' > data/input/first-pass-strains.txt
+# awk 'NR==3 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' >> data/input/first-pass-strains.txt
 
-python3 src/get-second-pass-strains.py
+# python3 src/get-second-pass-strains.py
 
-src/query-region.sh data/input/second-pass-strains.txt ${chromosome} ${start} ${end} ${replicates} && \
-mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.secondpass.tsv
+# src/query-region.sh data/input/second-pass-strains.txt ${chromosome} ${start} ${end} ${replicates} && \
+# mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.secondpass.tsv
 ```
 
 ## Print regions of interest
@@ -163,20 +163,22 @@ So we want lines 120768:138738 (17971 lines):
 ```
 head -n 138738 data/external/S288C_reference_sequence_R64-3-1_20210421.fsa | tail -n 17971 > data/external/S288C-chr12.fasta
 ```
-
-Extract variable sites:
-```
-zcat data/external/chromosome12.vcf.gz | awk '{print $2}' > data/processed/S288C-chr12-variable-sites.txt
-```
-Find all guides
-```
-python3 src/find-guides.py > data/processed/chr12-guides.tsv
-```
 chr12:171320-172320
 
-singularity exec ../pseudodiploidy/src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/input/type-a-strains.txt 12 171320 172320 > varSites-a.txtR
+# look at guides across whole pool
+cat data/processed/hyg-sensitive-alpha-distinct.txt data/processed/G418-sensitive-a-distinct.txt | sort -u > data/processed/pooled-distinct-strains.txt
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/pooled-distinct-strains.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-variable-sites.txt
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-variable-sites.txt $start $end
 
-vcf         data/external/chromosome12.vcf.gz
-strains     data/input/type-a-strains.txt
-strains     data/input/type-b-strains.txt
-chromosome  12
+# Try again excluding ADD, ABI, AGV:
+grep -v "ADD" data/processed/pooled-distinct-strains.txt | grep -v "ABI" | grep -v "AGV > data/processed/pooled-strains-minus-ADD-ABI-AGV
+
+
+# look at guides for separate pools
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/hyg-sensitive-alpha-distinct.txt ${chromosome} ${start} ${end} > data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt $start $end
+
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct.txt $start $end
+
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/G418-sensitive-a-distinct.txt ${chromosome} ${start} ${end} > data/processed/G418-sensitive-a-distinct-variable-sites.txt
+singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct-variable-sites.txt $start $end

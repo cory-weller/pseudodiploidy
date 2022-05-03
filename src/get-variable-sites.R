@@ -3,11 +3,13 @@
 library(data.table)
 
 args <- commandArgs(trailingOnly=TRUE)
+# args <- c('data/external/chromosome12.vcf.gz','data/processed/pooled-distinct-strains.txt','12','171320','172320')
 vcfFile <- args[1]
 strainsFile <- args[2]
 chromosome <- paste0('chromosome', args[3])
 start <- as.numeric(args[4])
 end <- as.numeric(args[5])
+
 
 # Load VCF
 vcf <- fread(vcfFile, header=FALSE)
@@ -17,6 +19,7 @@ setnames(vcf, '#CHROM', 'CHROM')
 
 strains <- fread(strainsFile, header=FALSE)$V1
 strains <- strains[strains != 'S288C']
+nStrains <- length(strains)
 
 desiredCols <- c('CHROM', 'POS', 'REF', 'ALT', strains)
 vcf <- vcf[, desiredCols, with=F][POS >= start & POS <= end & CHROM == chromosome]
@@ -33,6 +36,6 @@ vcf[, nMissing := apply(.SD, 1, function(x) sum(x == './.')), .SDcols=strains]
 
 
 # exclude all-ref strains
-vcf <- vcf[nRef + nMissing != 37]
+vcf <- vcf[nRef + nMissing != nStrains]
 # print variable sites
 cat(vcf$POS, sep="\n")
