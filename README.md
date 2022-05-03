@@ -24,6 +24,12 @@ start=171320
 end=172320
 replicates=1
 
+# Get Hygromycin-sensitive strains
+awk 'NR > 1 && $2=="TRUE" {print $1}' data/input/drug-resistance.tsv > data/input/hygromycin-sensitive.txt
+
+# Get G418-sensitive strains
+awk 'NR > 1 && $3=="TRUE" {print $1}' data/input/drug-resistance.tsv > data/input/G418-sensitive.txt
+
 # get strains for first pass
 src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
 mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
