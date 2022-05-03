@@ -15,7 +15,7 @@ bash src/get-data.sh
 ```
 
 ## Check windows for strain uniqueness for first and second pass
-```
+```bash
 # edit data/input/strains-to-start-with.txt
 # which includes the starting set of possible strains to consider
 
@@ -24,12 +24,19 @@ start=171320
 end=172320
 replicates=1
 
-# Get Hygromycin-sensitive strains
-awk 'NR > 1 && $2=="TRUE" {print $1}' data/input/drug-resistance.tsv > data/input/hygromycin-sensitive.txt
+# Get Hygromycin-sensitive alpha-strains
+awk 'NR > 1 && $2=="TRUE" && $5=="b" {print $1}' data/processed/strain-info.tsv > data/processed/hyg-sensitive-alpha.txt
+src/query-region.sh data/processed/hyg-sensitive-alpha.txt ${chromosome} ${start} ${end} ${replicates} 
+awk '$4=="b" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/hyg-sensitive-alpha-distinct.txt
+rm reports/chr${chromosome}-${start}-${end}.tsv
 
-# Get G418-sensitive strains
-awk 'NR > 1 && $3=="TRUE" {print $1}' data/input/drug-resistance.tsv > data/input/G418-sensitive.txt
+# Get G418-sensitive a-strains
+awk 'NR > 1 && $3=="TRUE" && $5=="a" {print $1}' data/processed/strain-info.tsv > data/processed/G418-sensitive-a.txt
+src/query-region.sh data/processed/G418-sensitive-a.txt ${chromosome} ${start} ${end} ${replicates} 
+awk '$4=="a" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/G418-sensitive-a-distinct.txt
+rm reports/chr${chromosome}-${start}-${end}.tsv
 
+## Remove following?
 # get strains for first pass
 src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
 mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
