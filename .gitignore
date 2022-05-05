@@ -8,3 +8,4 @@ chr*.tsv
 *.fsa.gz
 *.fsa
 *.fasta
+.snakemake/*

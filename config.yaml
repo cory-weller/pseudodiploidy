@@ -1,0 +1,16 @@
+---
+boxname: "nihbox"
+boxdir: "SBGE/data/simone/SMG_03142022/Fastq"
+pairs:
+    - "R1"
+    - "R2"
+samples:
+    - "1_S1"
+    - "2_S2"
+    - "3_S3"
+    - "4_S4"
+    - "5_S5"
+    - "6_S6"
+    - "7_S7"
+    - "8_S8"
+threads: 4
