@@ -14,3 +14,73 @@ samples:
     - "7_S7"
     - "8_S8"
 threads: 4
+
+run:
+    platform: miseq
+    date: 20220314
+    stage: raw
+    extension: 'fastq.gz'
+    gzip: True
+    cid: 77DD71E598E5B51B
+    reads:
+        - R1
+        - R2
+    sample:
+        S1:
+            R1:
+                fid: 2124917
+                authkey: AI_eHuOFjUUiiso
+            R2:
+                fid: 2124919
+                authkey: AKyAsaK8qcLH6FE
+        S2:
+            R1:
+                fid: 2124918
+                authkey: AJtbe3N1rNUHSEA
+            R2:
+                fid: 2124922
+                authkey: AMAnz6kWcZhJ_ck
+        S3:
+            R1:
+                fid: 2124920
+                authkey: AD7MNy6gN0fLej0
+            R2:
+                fid: 2124925
+                authkey: AK-Np4DFmgNzce4
+        S4:
+            R1:
+                fid: 2124921
+                authkey: AFWLx-wCUPjadcQ
+            R2:
+                fid: 2124924
+                authkey: AO3M30NgClZ6Xp0
+        S5:
+            R1:
+                fid: 2124923
+                authkey: AJvfx_8nVwvrTpE
+            R2:
+                fid: 2124927
+                authkey: ANd8hOayShsi2xE
+        S6:
+            R1: 
+                fid: 2124926
+                authkey: AJsj0visvUMJMxw
+            R2:
+                fid: 2124928
+                authkey: ABNqtM-Pl-soRHE
+        S7:
+            R1: 
+                fid: 2124929
+                authkey: ANSADechLh-OfNU
+            R2:
+                fid: 2124932
+                authkey: ADsLfwXrp6PBNuE
+        S8:
+            R1:
+                fid: 2124930
+                authkey: AJ-K18UXhS2a3xo
+            R2:
+                fid: 2124931
+                authkey: AN_A5LmOiZGjZco
+
+# filename = %s-%s-%s.%s.%s.%s % (date, sample
