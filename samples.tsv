@@ -1,0 +1,9 @@
+sample	filetype	date	stage	platform	type	filename1	ida	idb1	idc1	filename2	idb2	idc2
+S1	fastq.gz	20220314	raw	miseq	paired-end	20220314-S1-R1-raw.fastq.gz	77DD71E598E5B51B	2124917	AI_eHuOFjUUiiso	20220314-S1-R2-raw.fastq.gz	2124919	AKyAsaK8qcLH6FE
+S2	fastq.gz	20220314	raw	miseq	paired-end	20220314-S2-R1-raw.fastq.gz	77DD71E598E5B51B	2124918	AJtbe3N1rNUHSEA	20220314-S2-R2-raw.fastq.gz	2124922	AMAnz6kWcZhJ_ck
+S3	fastq.gz	20220314	raw	miseq	paired-end	20220314-S3-R1-raw.fastq.gz	77DD71E598E5B51B	2124920	AD7MNy6gN0fLej0	20220314-S3-R2-raw.fastq.gz	2124925	AK-Np4DFmgNzce4
+S4	fastq.gz	20220314	raw	miseq	paired-end	20220314-S4-R1-raw.fastq.gz	77DD71E598E5B51B	2124921	AFWLx-wCUPjadcQ	20220314-S4-R2-raw.fastq.gz	2124924	AO3M30NgClZ6Xp0
+S5	fastq.gz	20220314	raw	miseq	paired-end	20220314-S5-R1-raw.fastq.gz	77DD71E598E5B51B	2124923	AJvfx_8nVwvrTpE	20220314-S5-R2-raw.fastq.gz	2124927	ANd8hOayShsi2xE
+S6	fastq.gz	20220314	raw	miseq	paired-end	20220314-S6-R1-raw.fastq.gz	77DD71E598E5B51B	2124926	AJsj0visvUMJMxw	20220314-S6-R2-raw.fastq.gz	2124928	ABNqtM-Pl-soRHE
+S7	fastq.gz	20220314	raw	miseq	paired-end	20220314-S7-R1-raw.fastq.gz	77DD71E598E5B51B	2124929	ANSADechLh-OfNU	20220314-S7-R2-raw.fastq.gz	2124932	ADsLfwXrp6PBNuE
+S8	fastq.gz	20220314	raw	miseq	paired-end	20220314-S8-R1-raw.fastq.gz	77DD71E598E5B51B	2124930	AJ-K18UXhS2a3xo	20220314-S8-R2-raw.fastq.gz	2124931	AN_A5LmOiZGjZco

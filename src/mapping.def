@@ -1,0 +1,44 @@
+BootStrap: docker
+From: ubuntu:focal
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update && apt-get install -y \
+        build-essential \
+        coreutils \
+        bwa \
+        tabix \
+        default-jre \
+        openjdk-8-jdk \
+        parallel \
+        bzip2 \
+        gzip \
+        sed \
+        grep \
+        zip \
+        wget \
+        tar \
+        samtools
+         
+
+    GATKVER="4.1.8.1"
+    wget "https://github.com/broadinstitute/gatk/releases/download/${GATKVER}/gatk-${GATKVER}.zip"
+    unzip "gatk-${GATKVER}.zip"
+    mv gatk-${GATKVER}/gatk-package-${GATKVER}-local.jar /opt/gatk4.jar
+    rm -rf "gatk-${GATKVER}.zip" gatk-${GATKVER}
+
+    # Retrieve pear binary
+    wget -O pear-0.9.11-linux-x86_64.tar.gz "https://onedrive.live.com/download?cid=77DD71E598E5B51B&resid=77DD71E598E5B51B%2118198&authkey=AHPKCVLrX8ZLCFQ"
+    tar -zxvf pear-0.9.11-linux-x86_64.tar.gz
+    mv pear-0.9.11-linux-x86_64/bin/pear /opt/pear
+
+    unset DEBIAN_FRONTEND
+
+
+%environment
+    export PATH=$PATH:/opt/
+
+%runscript
+    alias gatk="java -jar /opt/gatk4.jar"
+    eval ${@}

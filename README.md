@@ -182,3 +182,21 @@ singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-gui
 
 singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/G418-sensitive-a-distinct.txt ${chromosome} ${start} ${end} > data/processed/G418-sensitive-a-distinct-variable-sites.txt
 singularity exec --bind ${PWD} src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct-variable-sites.txt $start $end
+
+# Looking at illumina seq data may 4 2022
+Retrieve reads from nih box:
+```
+module load rclone
+rclone copy --progress nihbox:/SBGE/data/simone/SMG_03142022/Fastq/8_S8_L001_R1_001.fastq.gz data/input/
+rclone copy --progress nihbox:/SBGE/data/simone/SMG_03142022/Fastq/8_S8_L001_R2_001.fastq.gz data/input/
+
+module load pear
+pear -f data/input/8_S8_L001_R1_001.fastq.gz \
+     -r data/input/8_S8_L001_R2_001.fastq.gz \
+     -o data/processed/sample8
+
+# remove unassembled or discarded reads, retaining 93.515 of original reads
+rm data/processed/sample8.{discarded,unassembled.forward,unassembled.reverse}.fastq
+gzip data/processed/sample8.assembled.fastq
+```
+
