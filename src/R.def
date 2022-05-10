@@ -19,6 +19,7 @@ From: ubuntu:focal
         liblzma-dev \
         tabix
 
+
     # Add necessary keys and repo for installing R 4.0 on ubuntu 20
     apt -y update
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -48,7 +49,5 @@ From: ubuntu:focal
     R --no-echo -e "BiocManager::install('apeglm')"
 
 
-%environment
-    export LANG="en_US.UTF-8"
-    export LC_ALL="C"
-    export DEBIAN_FRONTEND="noninteractive"
+%runscript
+    eval ${@}
