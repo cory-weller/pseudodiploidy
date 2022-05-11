@@ -1,4 +1,4 @@
-sample	filetype	date	stage	platform	type	filename1	ida	idb1	idc1	filename2	idb2	idc2
+sample	filetype	batch	stage	platform	type	filename1	ida	idb1	idc1	filename2	idb2	idc2
 S1	fastq.gz	20220314	raw	miseq	paired-end	20220314-S1-R1-raw.fastq.gz	77DD71E598E5B51B	2124917	AI_eHuOFjUUiiso	20220314-S1-R2-raw.fastq.gz	2124919	AKyAsaK8qcLH6FE
 S2	fastq.gz	20220314	raw	miseq	paired-end	20220314-S2-R1-raw.fastq.gz	77DD71E598E5B51B	2124918	AJtbe3N1rNUHSEA	20220314-S2-R2-raw.fastq.gz	2124922	AMAnz6kWcZhJ_ck
 S3	fastq.gz	20220314	raw	miseq	paired-end	20220314-S3-R1-raw.fastq.gz	77DD71E598E5B51B	2124920	AD7MNy6gN0fLej0	20220314-S3-R2-raw.fastq.gz	2124925	AK-Np4DFmgNzce4
