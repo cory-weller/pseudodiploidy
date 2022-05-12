@@ -9,3 +9,7 @@ chr*.tsv
 *.fsa
 *.fasta
 .snakemake/*
+*.fastq.gz
+*.fastq
+*.good.txt
+*.bad.txt

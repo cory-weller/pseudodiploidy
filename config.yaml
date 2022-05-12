@@ -11,9 +11,11 @@ debug_args:
     - 'src/analyze-sim-reads.py'
     - 'data/input/100-tiny.assembled.fastq'
     - 'data/processed/sample8'
-match_length: 35
-buffer_length: 0
-mismatch_tolerance: 3
+match_length: 50
+buffer_length: 10
+exclude_from_distal: 10
+exclude_from_proximal: 20
+pct_mismatch_tolerance: 0.05
 amplicons:
     spo13:
         upstream: "TATGCCATTCCCATCCAACGGCCGGAGTTGCTTTATCCGAATGTTAACGTATACGATTCGCCATTGTTTAAGAAAACAAGACTGCCCCATCAGACCAAAAGTCTAGATAAAGAAAAAAATTACCAATATCTTCCAATATATCCGGTCTCGATTTCTAATAACGGAGATTTTGTTGGCCAAGAGACA"

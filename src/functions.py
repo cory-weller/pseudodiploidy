@@ -1,9 +1,4 @@
-def yamlLoad(yamlfile):
-    import yaml
-    from yaml.loader import SafeLoader
-    with open(yamlfile, 'r') as infile:
-        contents = yaml.load(infile, Loader=SafeLoader)
-        return(contents)
+
 
 
 def cleanSeq(seq):
