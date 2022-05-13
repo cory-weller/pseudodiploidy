@@ -1,5 +1,13 @@
 # Yeast Strain Barcoding
 
+## Setup python environment
+```
+mamba create -n pseudo python=3.8
+mamba activate pseudo
+mamba install -q regex pyyaml pylint
+```
+
+
 ## Activate OR install Singularity
 ```
 # install on your system if you have sudo
