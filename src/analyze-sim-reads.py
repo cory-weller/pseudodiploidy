@@ -8,7 +8,6 @@ import itertools
 # import gzip
 # import bisect
 import yaml
-import src.functions as f
 import regex as re
 from yaml.loader import SafeLoader
 
@@ -20,6 +19,7 @@ def yaml_load(yamlfilename):
     with open(yamlfilename, 'r', encoding='utf-8') as yamlfile:
         contents = yaml.load(yamlfile, Loader=SafeLoader)
         return contents
+
 
 def clean_seq(seq):
     '''removes whitespace from sequences and converts to upper-case'''
@@ -44,57 +44,11 @@ def reverse_complement(seq):
         seq = seq.replace(i, '')
     try:
         reverse_seq = ''.join([pairs[i] for i in seq[::-1]])
-    except KeyError as error:
-        logger.error('sequence %s being reverse complemented contains something outside of [ACTGN]', seq)
-        sys.exit(f"ERROR: {error}")
+    except KeyError as err:
+        logger.error('The sequence being reverse complemented,'
+                     ' %s contains characters other than [ACTGN]', seq)
+        sys.exit(f"ERROR: {err}")
     return reverse_seq
-
-
-CONFIG = yaml_load('config.yaml')
-LOGGING_LEVEL = CONFIG['logging']
-
-# set logging console handler
-logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
-console_handler = logging.StreamHandler()
-console_handler.setLevel(level=LOGGING_LEVEL)
-console_handler_format = '%(levelname)s: %(message)s'
-console_handler.setFormatter(logging.Formatter(console_handler_format))
-logger.addHandler(console_handler)
-
-# set logging shutdown handler
-
-# try:
-#     logger.info("Attempting to load src/functions.py")
-#     import src.functions as f
-# except ModuleNotFoundError:
-#     logger.warning("src/functions.py not found in $PYTHONPATH.")
-#     logger.warning(f"Setting os.environ['PYTHONPATH'] to current directory {os.getcwd()} and trying again." % (os.getcwd()))
-#     try:
-#         os.environ['PYTHONPATH'] = os.getcwd()
-#         import src.functions as f
-#     except ModuleNotFoundError as e:
-#         logger.error( "Could not load src/functions.py. Confirm you are running from the top level of this project directory and/or set $PYTHONPATH to the top level of this project directory and try again.")
-#         sys.exit("ModuleNotFoundError: " + str(e))
-#     else:
-#         logger.info("Successfully loaded src/functions.py after automatically setting $PYTHONPATH")
-# else:
-#     logger.info("Successfully loaded src/functions.py")
-
-
-try:
-    assert os.environ['PYTHONPATH'] == os.getcwd()
-except AssertionError as err:
-    sys.exit("""
-    ERROR while running %s:
-    $PYTHONPATH environmental variable does not match current directory. Ensure you are in the top level of the project directory,
-    and that $PYTHONPATH is set to the top level of the project directory.
-    e.g., export PYTHONPATH=/path/to/pseudodiploidy/
-
-    $PYTHONPATH: %s
-    current directory: %s
-
-    """ % (os.path.basename(sys.argv[0]), os.environ['PYTHONPATH'], os.getcwd(), ))
 
 def split_seq(seq, geneName, regexLeft, regexRight):
     ''' Trims sequence before and after defined constant region regex patterns'''
@@ -107,6 +61,37 @@ def split_seq(seq, geneName, regexLeft, regexRight):
     except AttributeError:
         return None
     return([geneName, seq, beforeMatchL, matchL, beforeMatchR, matchR, afterMatchR])
+
+def check_pythonpath():
+    '''Confirms current directory is in $PYTHONPATH'''
+    try:
+        assert os.environ['PYTHONPATH'] == os.getcwd()
+    except AssertionError:
+        sys.exit(
+        f'ERROR while running {os.path.basename(sys.argv[0])}:'
+            ' $PYTHONPATH environmental variable does not match current directory.'
+            ' Ensure you are in the top level of the project directory,'
+            ' and that $PYTHONPATH is set to the top level of the project directory.'
+            ' e.g., export PYTHONPATH=/path/to/pseudodiploidy/'
+        )
+
+CONFIG = yaml_load('config.yaml')
+LOGGING_LEVEL = CONFIG['logging']
+
+# set logging console handler
+logger = logging.getLogger()
+logger.setLevel(logging.NOTSET)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(level=LOGGING_LEVEL)
+console_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+logger.addHandler(console_handler)
+
+
+
+MYTHING = reverse_complement('actgn')
+URTHING = clean_seq('actgn')
+
+
 
 
 
