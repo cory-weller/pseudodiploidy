@@ -13,3 +13,4 @@ chr*.tsv
 *.fastq
 *.good.txt
 *.bad.txt
+.vscode/
