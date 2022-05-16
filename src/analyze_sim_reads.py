@@ -5,8 +5,6 @@ import os
 import logging
 import contextlib
 import itertools
-# import gzip
-# import bisect
 import yaml
 import regex as re
 from yaml.loader import SafeLoader
@@ -50,17 +48,19 @@ def reverse_complement(seq):
         sys.exit(f"ERROR: {err}")
     return reverse_seq
 
+
 def split_seq(seq, geneName, regexLeft, regexRight):
     ''' Trims sequence before and after defined constant region regex patterns'''
     # Trim left constant sequence
     try:
-        matchL = re.search(regexLeft, seq).captures()[0]
-        beforeMatchL, afterMatchL = seq.split(matchL)
-        matchR = re.search(regexRight, afterMatchL).captures()[0]
-        beforeMatchR, afterMatchR = afterMatchL.split(matchR)
+        match_L = re.search(regexLeft, seq).captures()[0]
+        before_match_L, after_match_L = seq.split(match_L)
+        match_R = re.search(regexRight, after_match_L).captures()[0]
+        before_match_R, after_match_R = after_match_L.split(match_R)
     except AttributeError:
         return None
-    return([geneName, seq, beforeMatchL, matchL, beforeMatchR, matchR, afterMatchR])
+    return([geneName, seq, before_match_L, match_L, before_match_R, match_R, after_match_R])
+
 
 def check_pythonpath():
     '''Confirms current directory is in $PYTHONPATH'''
@@ -75,140 +75,125 @@ def check_pythonpath():
             ' e.g., export PYTHONPATH=/path/to/pseudodiploidy/'
         )
 
-CONFIG = yaml_load('config.yaml')
-LOGGING_LEVEL = CONFIG['logging']
 
-# set logging console handler
-logger = logging.getLogger()
-logger.setLevel(logging.NOTSET)
-console_handler = logging.StreamHandler()
-console_handler.setLevel(level=LOGGING_LEVEL)
-console_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
-logger.addHandler(console_handler)
+def match_sequence_perfect(seq, amplicons):
+    '''returns array for whether or not the given seqs match any patterns'''
+    output = []
+    for i in amplicons:
+        if re.search(i.regex_pattern1, seq):
+            output.append(i.name)
+    if len(output) > 0:
+        return output
+    return None
 
-
-
-MYTHING = reverse_complement('actgn')
-URTHING = clean_seq('actgn')
-
-
-
-
-
-
-
-MATCH_LENGTH = CONFIG['match_length']
-MISMATCH_TOLERANCE = CONFIG['mismatch_tolerance']
-BUFFER_LENGTH = CONFIG['buffer_length']
-DEBUG_ARGS = CONFIG['debug_args']
-
-args = sys.argv
-if len(args) == 1:       # if no args supplied, e.g. debuging
-    print('\n'.join(['running with debug arguments:'] + DEBUG_ARGS))
-    args = DEBUG_ARGS
+def match_sequence_fuzzy(seq, amplicons):
+    '''returns array for whether or not the given seqs match any patterns'''
+    output = []
+    for i in amplicons:
+        if re.search(i.regex_pattern2, seq):
+            return(i.name)
+    if len(output) > 0:
+        return output
+    return ['nomatch']
 
 
-infile = args[1]        # infile is: /path/to/file/BATCH_SAMPLENAME.assembled.fastq
+class Amplicon:
+    def __init__(self,
+                name,
+                upstream,
+                downstream,
+                wt,
+                edit,
+                pad_left,
+                pad_right,
+                max_errors
+    ):
+        self.name = name
+        self.upstream = upstream
+        self.downstream = downstream
+        self.wt = wt
+        self.edit = edit
+        self.seq = self.upstream[pad_left : -pad_right]
+        self.regex_pattern1 = re.compile(fr"({self.seq})")
+        self.regex_pattern2 = re.compile(fr"({self.seq}){{e<={max_errors}}}")
 
+if __name__ == '__main__':
+    # Load config and 
 
-filestem = os.path.basename(infile).split('.assembled.fastq')[0] # filestem is: BATCH_SAMPLENAME.assembled.fastq
-batch, samplename = filestem.split('-')
+    CONFIG = yaml_load('config.yaml')
+    DEBUG_ARGS = CONFIG['debug_args']
 
-# logger.debug('test')
-# logger.info('test')
-# logger.warning('test')
-# logger.error('test')
-# logger.critical('test')
+    # Initialize logging
+    LOGGING_LEVEL = CONFIG['logging']
+    logger = logging.getLogger()
+    logger.setLevel(logging.NOTSET)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(level=LOGGING_LEVEL)
+    console_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+    logger.addHandler(console_handler)
 
-genes = list(CONFIG['amplicons'].keys())
-genes.append('nomatch')
+    # Parse args
+    myargs = sys.argv
+    if len(myargs) == 1:       # if no args supplied, e.g. debuging
+        print('\n'.join(['running with debug arguments:'] + DEBUG_ARGS))
+        myargs = DEBUG_ARGS
 
-for gene in genes:
-    logger.debug('Generating regex pattern for ' + gene)
+    fastq_name = myargs[1]        # /path/to/file/BATCH_SAMPLENAME.assembled.fastq
+    logger.info("fastq input filename: %s", fastq_name)
+    # filestem formatted/parsed with hyphen delimiter, as BATCH-SAMPLE.assembled.fastq
+    filestem = os.path.basename(fastq_name).split('.assembled.fastq')[0] 
+    logger.info("filestem: %s", filestem)
+    batch, samplename = filestem.split('-')
+    logger.info("batch: %s", batch)
+    logger.info("samplename: %s", samplename)
 
-    upNucleotides = CONFIG['amplicons'][gene]['upstream'][::-1][BUFFER_LENGTH:(BUFFER_LENGTH + MATCH_LENGTH)][::-1]       # reverse, take first MATCH_LENGTH chars, reverse again
-    logger.debug('upNucleotides: ' + upNucleotides)
+    out_folder = '/'.join(fastq_name.split('/')[:-1]) + '/'
 
-    upString = r"%s{s<=%s}" % (upNucleotides,MISMATCH_TOLERANCE)
-    logger.debug('upString: ' + upString)
+    # Initialize amplicons
+    MISMATCH_TOLERANCE = float(CONFIG['pct_mismatch_tolerance'])
+    gene_names = list(CONFIG['amplicons'].keys())
+    amplicons = []
+    for gene in gene_names:
+        amplicon = Amplicon(gene,
+                    CONFIG['amplicons'][gene]['upstream'],
+                    CONFIG['amplicons'][gene]['downstream'],
+                    CONFIG['amplicons'][gene]['wt'],
+                    CONFIG['amplicons'][gene]['edit'],
+                    CONFIG['pad_left'],
+                    CONFIG['pad_right'],
+                    int(len(CONFIG['amplicons'][gene]['upstream'])* MISMATCH_TOLERANCE)
+        )
+        amplicons.append(amplicon)
+    
+    for amplicon in amplicons:
+        logger.info("adding amplicon: %s", amplicon.name)
+        logger.info("adding perfect match pattern: %s", amplicon.regex_pattern1)
+        logger.info("adding fuzzy match pattern: %s", amplicon.regex_pattern2)
+    
+    # Evaluate reads
 
-    upRegexPattern = re.compile(upString)
-    CONFIG['amplicons'][gene]['upRegexPattern'] = upRegexPattern
-    logger.debug('upRegexPattern: ' + str(upRegexPattern))
+    with contextlib.ExitStack() as stack, \
+    open(fastq_name, 'r', encoding='utf-8') as infile:
+        files = {}
+        unmatched = []
+        for gene in gene_names +  ['nomatch']:
+            filename = f'{samplename}-{gene}.txt'
+            files[gene] = stack.enter_context(open(filename, 'w', encoding='utf-8'))
+        # Iterate over fastq lines for perfect matches
+        logger.info("iterating over raw reads")
+        for line in itertools.zip_longest(*[infile]*4):
+            seq = line[1].strip()
+            matches = match_sequence_perfect(seq, amplicons)
+            if matches is None:
+                unmatched.append(seq)
+            else:
+                for match in matches:
+                    print(seq, file=files[match])
+        # Iterate over unmatched sequences with fuzzy tolerance
+        logger.info("iterating over %s unmatched reads with fuzzy tolerance", len(unmatched))
+        for seq in unmatched:
+            matches = match_sequence_fuzzy(seq, amplicons)
+            for match in matches:
+                print(match, file=files[match])
 
-    downNucleotides = CONFIG['amplicons'][gene]['downstream'][BUFFER_LENGTH:(BUFFER_LENGTH + MATCH_LENGTH)]
-    logger.debug('downNucleotides: ' + downNucleotides)
-
-    downString = r"%s{s<=%s}" % (downNucleotides,MISMATCH_TOLERANCE)
-    logger.debug('downString: ' + downString)
-
-    downRegexPattern = re.compile(downString)
-    CONFIG['amplicons'][gene]['downRegexPattern'] = downRegexPattern
-    logger.debug('downRegexPattern: ' + str(downRegexPattern))
-
-for gene in genes:
-    logger.debug('Generating regex pattern for ' + gene)
-
-    upNucleotides = CONFIG['amplicons'][gene]['upstream'][::-1][BUFFER_LENGTH:(BUFFER_LENGTH + MATCH_LENGTH)][::-1]       # reverse, take first MATCH_LENGTH chars, reverse again
-    logger.debug('upNucleotides: ' + upNucleotides)
-
-    downNucleotides = CONFIG['amplicons'][gene]['downstream'][BUFFER_LENGTH:(BUFFER_LENGTH + MATCH_LENGTH)]
-    logger.debug(f'downNucleotides: {downNucleotides}')
-
-    regexPattern = r"%s.*%s{s<=%s}" % (upNucleotides, downNucleotides, MISMATCH_TOLERANCE)
-
-    CONFIG['amplicons'][gene]['downRegexPattern'] = downRegexPattern
-    logger.debug(f'downRegexPattern: {downRegexPattern}')
-
-
-
-
-logger.info("Importing fastq sequences from %s" , infile)
-
-goodSeqFile = "data/processed/%s-%s.good.txt" % (batch, samplename)
-logger.info("Writing seqs with a match to %s" , goodSeqFile)
-
-badSeqFile = "data/processed/%s-%s.bad.txt" % (batch, samplename)
-logger.info("Writing seqs with no matches to %s", badSeqFile)
-
-
-with open(infile, 'r') as infile, open(goodSeqFile, 'w', encoding='utf-8') as goodOut, open(badSeqFile, 'w', encoding='utf-8') as badOut:
-    for lines in itertools.zip_longest(*[infile]*4):
-        breakoutFlag = False
-        rawSeq = lines[1].strip() 
-        for gene in genes:
-            result = split_seq(rawSeq, gene, CONFIG['amplicons'][gene]['upRegexPattern'], CONFIG['amplicons'][gene]['downRegexPattern'])
-            if result is not None:
-                goodOut.write('\t'.join(result) + '\n')
-                breakoutFlag = True
-        if breakoutFlag:
-            continue
-        badOut.write(rawSeq + '\n')
-
-genes = ['spo13','can1','his2']
-
-genes.append('nomatch')
-
-sample = 'S2'
-
-
-
-with contextlib.ExitStack() as stack,  open('data/input/100-tiny.assembled.fastq', 'r') as infile:
-    files = {}
-    for gene in genes:
-        filename = f'{sample}-{gene}.txt'
-        files[gene] = stack.enter_context(open(filename, 'w'))
-    # set up file handling
-    for line in itertools.zip_longest(*[infile]*4):
-        rawseq = line[1].strip()
-        if 'TTGGATGTTAATTGTTCCGATTATGAG' in rawseq:
-            match = 'spo13'
-        elif 'CTTTACCTTGTCATAGCACACAC' in rawseq:
-            match = 'his2'
-        elif 'AGAAAACTGTGAAAGAGGATGTAACAGGGA' in rawseq:
-            match = 'can1'
-        else:
-            match = 'nomatch'
-        print(rawseq, file=files[match])
-
-sys.exit()
+    sys.exit()

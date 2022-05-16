@@ -8,13 +8,10 @@ run:
 logging: DEBUG
 project_path: /data/wellerca/projects/pseudodiploidy/
 debug_args:
-    - 'src/analyze-sim-reads.py'
+    - 'src/analyze_sim_reads.py'
     - 'data/input/100-tiny.assembled.fastq'
-    - 'data/processed/sample8'
-match_length: 50
-buffer_length: 10
-exclude_from_distal: 10
-exclude_from_proximal: 20
+pad_left: 10
+pad_right: 10
 pct_mismatch_tolerance: 0.05
 amplicons:
     spo13:
