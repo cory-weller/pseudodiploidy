@@ -75,34 +75,34 @@ bash src/print-region-to-file.sh 2 80000 81000
 ## Transform data
 ```
 # Build count matrix for DESeq
-singularity exec --bind ${PWD} src/R.sif Rscript \
+singularity exec --bind $(pwd -P) src/R.sif Rscript \
     src/build-count-matrix.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/featurecounts-matrix.RDS
 
 # Build TPM table for other analyses
-singularity exec --bind ${PWD} src/R.sif Rscript \
+singularity exec --bind $(pwd -P) src/R.sif Rscript \
     src/build-TPM-table.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/TPM.txt.gz
 
 # Build DESeq Data Set (DDS) Object
-singularity exec --bind ${PWD} src/R.sif Rscript \
+singularity exec --bind $(pwd -P) src/R.sif Rscript \
     src/build-DDS.R \
     data/processed/featurecounts-matrix.RDS \
     data/input/samples.csv \
     data/processed/DDS.RDS
 
 # Run differential expression contrasts
-singularity exec --bind ${PWD} src/R.sif Rscript \
+singularity exec --bind $(pwd -P) src/R.sif Rscript \
     src/run-contrast.R
 ```
 
 # Run exploratory analyses
 ```
-singularity exec --bind ${PWD} src/R.sif R
+singularity exec --bind $(pwd -P) src/R.sif R
 ```
 
 # 1011-barcodes
@@ -176,19 +176,19 @@ chr12:171320-172320
 
 # look at guides across whole pool
 cat data/processed/hyg-sensitive-alpha-distinct.txt data/processed/G418-sensitive-a-distinct.txt | sort -u > data/processed/pooled-distinct-strains.txt
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/pooled-distinct-strains.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-variable-sites.txt
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-variable-sites.txt $start $end
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/pooled-distinct-strains.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-variable-sites.txt
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-variable-sites.txt $start $end
 
 # Try again excluding ADD, ABI, AGV:
 grep -v "ADD" data/processed/pooled-distinct-strains.txt | grep -v "ABI" | grep -v "AGV > data/processed/pooled-strains-minus-ADD-ABI-AGV
 
 
 # look at guides for separate pools
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/hyg-sensitive-alpha-distinct.txt ${chromosome} ${start} ${end} > data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt $start $end
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/hyg-sensitive-alpha-distinct.txt ${chromosome} ${start} ${end} > data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt $start $end
 
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/G418-sensitive-a-distinct.txt ${chromosome} ${start} ${end} > data/processed/G418-sensitive-a-distinct-variable-sites.txt
-singularity exec --bind $(readlink ${PWD}) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct-variable-sites.txt $start $end
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/G418-sensitive-a-distinct.txt ${chromosome} ${start} ${end} > data/processed/G418-sensitive-a-distinct-variable-sites.txt
+singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct-variable-sites.txt $start $end
 
 # Looking at illumina seq data may 4 2022
 Retrieve reads from nih box:
