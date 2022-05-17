@@ -49,17 +49,17 @@ def reverse_complement(seq):
     return reverse_seq
 
 
-def split_seq(seq, geneName, regexLeft, regexRight):
-    ''' Trims sequence before and after defined constant region regex patterns'''
-    # Trim left constant sequence
-    try:
-        match_L = re.search(regexLeft, seq).captures()[0]
-        before_match_L, after_match_L = seq.split(match_L)
-        match_R = re.search(regexRight, after_match_L).captures()[0]
-        before_match_R, after_match_R = after_match_L.split(match_R)
-    except AttributeError:
-        return None
-    return([geneName, seq, before_match_L, match_L, before_match_R, match_R, after_match_R])
+# def split_seq(seq, geneName, regexLeft, regexRight):
+#     ''' Trims sequence before and after defined constant region regex patterns'''
+#     # Trim left constant sequence
+#     try:
+#         match_L = re.search(regexLeft, seq).captures()[0]
+#         before_match_L, after_match_L = seq.split(match_L)
+#         match_R = re.search(regexRight, after_match_L).captures()[0]
+#         before_match_R, after_match_R = after_match_L.split(match_R)
+#     except AttributeError:
+#         return None
+#     return([geneName, seq, before_match_L, match_L, before_match_R, match_R, after_match_R])
 
 
 def check_pythonpath():
@@ -88,16 +88,14 @@ def match_sequence_perfect(seq, amplicons):
 
 def match_sequence_fuzzy(seq, amplicons):
     '''returns array for whether or not the given seqs match any patterns'''
-    output = []
     for i in amplicons:
         if re.search(i.regex_pattern2, seq):
-            return(i.name)
-    if len(output) > 0:
-        return output
+            return i.name
     return ['nomatch']
 
 
 class Amplicon:
+    '''describes information in config.yaml for identifying various sequenced amplicons'''
     def __init__(self,
                 name,
                 upstream,
@@ -147,8 +145,6 @@ if __name__ == '__main__':
     logger.info("batch: %s", batch)
     logger.info("samplename: %s", samplename)
 
-    out_folder = '/'.join(fastq_name.split('/')[:-1]) + '/'
-
     # Initialize amplicons
     MISMATCH_TOLERANCE = float(CONFIG['pct_mismatch_tolerance'])
     gene_names = list(CONFIG['amplicons'].keys())
@@ -164,12 +160,12 @@ if __name__ == '__main__':
                     int(len(CONFIG['amplicons'][gene]['upstream'])* MISMATCH_TOLERANCE)
         )
         amplicons.append(amplicon)
-    
+
     for amplicon in amplicons:
         logger.info("adding amplicon: %s", amplicon.name)
         logger.info("adding perfect match pattern: %s", amplicon.regex_pattern1)
         logger.info("adding fuzzy match pattern: %s", amplicon.regex_pattern2)
-    
+
     # Evaluate reads
 
     with contextlib.ExitStack() as stack, \
@@ -177,7 +173,7 @@ if __name__ == '__main__':
         files = {}
         unmatched = []
         for gene in gene_names +  ['nomatch']:
-            filename = f'{samplename}-{gene}.txt'
+            filename = f'data/processed/{samplename}-{gene}.txt'
             files[gene] = stack.enter_context(open(filename, 'w', encoding='utf-8'))
         # Iterate over fastq lines for perfect matches
         logger.info("iterating over raw reads")

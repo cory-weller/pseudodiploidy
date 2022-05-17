@@ -7,11 +7,13 @@ project_path = config['project_path']
 
 SAMPLES = list(samples['sample'])   # SAMPLES: list of samples of given BATCH that will be processed
 BATCH = config['run']['batch']      # BATCH: identifies the group of samples we're concerned with, e.g. date of sequencing run
+GENES = list(config['amplicons'].keys())
 
 # rule targets identifies the list of final output files to generate
 rule targets:
     input:
-        expand("data/processed/{batch}-{sample}.{types}.txt", batch=BATCH, sample=SAMPLES, types=['good','bad'])
+        expand("data/processed/{batch}-{sample}-summary.txt", batch=BATCH, sample=SAMPLES)
+        #expand("data/processed/{batch}-{sample}-{gene}.txt", batch=BATCH, sample=SAMPLES, gene=GENES)
         #expand("data/input/{batch}-{sample}.assembled.fastq", batch=BATCH, sample=SAMPLES)
 
 rule get_reads:
@@ -43,7 +45,11 @@ rule pair_with_pear:
     input:
         r1="data/input/{batch}-{sample}-R1-raw.fastq.gz",
         r2="data/input/{batch}-{sample}-R2-raw.fastq.gz"
-    output: "data/input/{batch}-{sample}.assembled.fastq"
+    output: 
+        "data/input/{batch}-{sample}.assembled.fastq",
+        temp("data/input/{batch}-{sample}.unassembled.forward.fastq"),
+        temp("data/input/{batch}-{sample}.unassembled.reverse.fastq"),
+        temp("data/input/{batch}-{sample}.discarded.fastq")
     threads: 2
     resources:
         mem_mb = 1024*4,
@@ -57,15 +63,57 @@ rule pair_with_pear:
         """
 
 rule assess_reads:
-    input: "data/input/{batch}-{sample}.assembled.fastq"
-    output: 
-        o1="data/processed/{batch}-{sample}.good.txt",
-        o2="data/processed/{batch}-{sample}.bad.txt"
+    input: 
+        "data/input/{batch}-{sample}.assembled.fastq"
+    output:
+        temp(expand("data/processed/{{batch}}-{{sample}}-{gene}.txt", gene=GENES))
+    threads: 1
+    resources:
+        mem_mb = 1024*3,
+        runtime_min = 30
+    shell:
+        """
+        python3 src/analyze_sim_reads.py {input}
+        """
+
+rule convert_to_fasta:
+    input:
+        "data/processed/{batch}-{sample}-{gene}.txt"
+    output:
+        "data/processed/{batch}-{sample}-{gene}.fa"
+    threads: 1
+    resources:
+        mem_mb = 1024*3,
+        runtime_min = 5
+    shell:
+        """
+        awk '{{print NR,$0}}' {input} |sed 's/^/>/g' | tr " " "\n" | fold > {output}
+        """
+
+rule multi_sequence_align:
+    input:
+        "data/processed/{batch}-{sample}-{gene}.fa"
+    output:
+        "data/processed/{batch}-{sample}-{gene}.aln"
     threads: 1
     resources:
         mem_mb = 1024*3,
         runtime_min = 10
     shell:
         """
-        python3 src/analyze-sim-reads.py {input}
+        src/clustalo -i {input} > {output}
+        """
+
+rule process_gene_stats:
+    input:
+        expand("data/processed/{{batch}}-{{sample}}-{gene}.aln", gene=GENES)
+    output:
+        "data/processed/{batch}-{sample}-summary.txt"
+    threads: 1
+    resources:
+        mem_mb = 1024*3,
+        runtime_min = 10
+    shell:
+        """
+        touch {output}
         """
