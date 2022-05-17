@@ -1,97 +1,109 @@
-Standardized_name	HYG_sensitive	G418_sensitive	Ploidy	Mating	Ploidy_comments	CLADES
-AAE	TRUE	TRUE	1	a	euploid	1. Wine/European
-AAG	TRUE	FALSE	1	a	euploid	M3. Mosaic region 3
-AAK	FALSE	TRUE	1	a	euploid	1. Wine/European
-AAR	TRUE	FALSE	1	b	euploid	7. Mosaic beer
-AAT	TRUE	FALSE	1	b	aneu;+1*1;	M3. Mosaic region 3
-ABB	TRUE	FALSE	1	b	euploid	26. Asian fermentation
-ABC	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABF	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABG	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABH	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABI	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABK	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ABL	FALSE	FALSE	1	b	euploid	
-ABM	TRUE	FALSE	1	b	euploid	2. Alpechin
-ABP	TRUE	FALSE	1	b	euploid	1. Wine/European
-ABQ	TRUE	FALSE	1	b	euploid	1. Wine/European
-ABR	TRUE	FALSE	1	b	euploid	1. Wine/European
-ABS	TRUE	FALSE	1	b	euploid	1. Wine/European
-ABT	TRUE	FALSE	1	b	euploid	1. Wine/European
-ACB	TRUE	TRUE	1	b	euploid	M3. Mosaic region 3
-ACC	TRUE	FALSE	1	b	euploid	21. Ecuadorean
-ACD	TRUE	FALSE	1	b	euploid	23. North American oak
-ACF	TRUE	TRUE	1	b	euploid	1. Wine/European
-ACG	TRUE	FALSE	1	b	euploid	M1. Mosaic region 1
-ACH	TRUE	FALSE	1	b	euploid	M1. Mosaic region 1
-ACK	TRUE	FALSE	1	b	euploid	26. Asian fermentation
-ACL	TRUE	TRUE	1	b	aneu;+1*12;	M3. Mosaic region 3
-ACM	TRUE	TRUE	1	b	euploid	26. Asian fermentation
-ACN	TRUE	TRUE	1	b	euploid	M3. Mosaic region 3
-ACP	TRUE	FALSE	1	b	euploid	1. Wine/European
-ACQ	TRUE	FALSE	1	b	euploid	18. Far East Asia
-ACR	TRUE	FALSE	1	b	euploid	1. Wine/European
-ACS	TRUE	FALSE	1	b	euploid	M1. Mosaic region 1
-ACT	TRUE	FALSE	1	b	aneu;+1*1;	1. Wine/European
-ACV	TRUE	FALSE	1	b	aneu;+1*1;	1. Wine/European
-ADA	TRUE	FALSE	1	b	euploid	M3. Mosaic region 3
-ADC	TRUE	FALSE	1	b	euploid	1. Wine/European
-ADD	TRUE	FALSE	1	b	euploid	1. Wine/European
-ADE	TRUE	FALSE	1	b	euploid	
-ADF	TRUE	FALSE	1	b	euploid	13. Africanpalm wine
-ADG	TRUE	FALSE	1	b	euploid	
-ADH	TRUE	FALSE	1	b	euploid	26. Asian fermentation
-ADI	TRUE	TRUE	1	b	euploid	1. Wine/European
-ADN	TRUE	TRUE	1	a	euploid	25. Sake
-ADR	TRUE	FALSE	1	b	euploid	1. Wine/European
-ADT	TRUE	TRUE	1	b	euploid	M3. Mosaic region 3
-ADV	TRUE	TRUE	1	b	euploid	13. Africanpalm wine
-AEA	TRUE	TRUE	1	b	euploid	7. Mosaic beer
-AEF	TRUE	TRUE	1	b	euploid	25. Sake
-AEG	TRUE	TRUE	1	a	euploid	3. Brazilian bioethanol
-AEH	TRUE	FALSE	1	a	euploid	3. Brazilian bioethanol
-AEI	TRUE	TRUE	1	a	euploid	M3. Mosaic region 3
-AEM	TRUE	TRUE	1	b	aneu;+1*11;	8. Mixed origin
-AEQ	TRUE	TRUE	1	b	euploid	7. Mosaic beer
-AER	TRUE	TRUE	1	a	aneu;+1*2;+1*4;+1*8;+1*9;	M2. Mosaic region 2
-AES	TRUE	TRUE	1	a	aneu;+1*2;	1. Wine/European
-AFB	TRUE	TRUE	1	a	euploid	7. Mosaic beer
-AFD	TRUE	TRUE	1	a	euploid	3. Brazilian bioethanol
-AFF	TRUE	TRUE	1	a	euploid	8. Mixed origin
-AFG	TRUE	TRUE	1	a	euploid	M3. Mosaic region 3
-AFH	TRUE	TRUE	1	a	euploid	26. Asian fermentation
-AFM	TRUE	TRUE	1	b	euploid	25. Sake
-AFN	TRUE	TRUE	1	a	euploid	25. Sake
-AFQ	TRUE	TRUE	1	a	euploid	M2. Mosaic region 2
-AFR	TRUE	TRUE	1	a	aneu;+1*1;	3. Brazilian bioethanol
-AGC	TRUE	TRUE	1	b	aneu;+1*1;+1*5;+1*10;+1*11;	
-AGF	FALSE	TRUE	1	a	euploid	1. Wine/European
-AGK	TRUE	TRUE	1	b	euploid	8. Mixed origin
-AGM	FALSE	TRUE	1	a	euploid	3. Brazilian bioethanol
-AGN	FALSE	TRUE	1	a	euploid	M1. Mosaic region 1
-AGP	TRUE	TRUE	1	a	aneu;+1*1;+1*9;	M3. Mosaic region 3
-AGR	FALSE	TRUE	1	a	euploid	24. Asian islands
-AGS	FALSE	TRUE	1	a	euploid	1. Wine/European
-AGT	FALSE	TRUE	1	a	euploid	M3. Mosaic region 3
-AGV	FALSE	TRUE	1	a	euploid	1. Wine/European
-AHA	FALSE	TRUE	1	a	euploid	M3. Mosaic region 3
-AHB	FALSE	TRUE	1	a	euploid	
-AHC	FALSE	TRUE	1	a	euploid	3. Brazilian bioethanol
-AHD	FALSE	TRUE	1	a	aneu;+1*1;	1. Wine/European
-AHE	FALSE	FALSE	1	b	aneu;+1*8;	1. Wine/European
-AHF	FALSE	TRUE	1	a	euploid	M1. Mosaic region 1
-AHG	FALSE	FALSE	1	a	euploid	1. Wine/European
-AHH	FALSE	TRUE	1	a	euploid	24. Asian islands
-AHI	FALSE	TRUE	1	a	aneu;+1*14;	1. Wine/European
-AHK	FALSE	FALSE	1	a	euploid	1. Wine/European
-AHL	FALSE	FALSE	1	a	euploid	2. Alpechin
-AHM	FALSE	TRUE	1	a	euploid	2. Alpechin
-AHN	FALSE	TRUE	1	a	euploid	1. Wine/European
-AHQ	FALSE	TRUE	1	a	euploid	26. Asian fermentation
-AHR	TRUE	TRUE	1	a	euploid	1. Wine/European
-AHS	TRUE	TRUE	1	b	aneu;+1*9;	13. Africanpalm wine
-AHT	FALSE	TRUE	1	a	euploid	1. Wine/European
-AHV	FALSE	TRUE	1	a	aneu;+1*1;+1*11;	8. Mixed origin
-AIA	FALSE	FALSE	1	a	euploid	1. Wine/European
-AIB	TRUE	FALSE	1	b	euploid	1. Wine/European
-AIE	FALSE	TRUE	1	a	aneu;+1*9;	2. Alpechin
+Standardized_name	Strain_Name_4SRA	hyg_sensitive	G418_sensitive	Mating
+AAR	CLIB382_1b	TRUE	FALSE	b
+AAT	YJM280_b	TRUE	FALSE	b
+ABB	YJM413_b	TRUE	FALSE	b
+ABC	YJM421_b	TRUE	FALSE	b
+ABF	YJM436_1b	TRUE	FALSE	b
+ABG	YJM440_1b	TRUE	FALSE	b
+ABH	YJM454_1b	TRUE	FALSE	b
+ABI	YJM653_1b	TRUE	FALSE	b
+ABK	YJM678_1b	TRUE	FALSE	b
+ABL	CBS2888_1b	FALSE	FALSE	b
+ABM	CBS3093_1b	TRUE	FALSE	b
+ABP	CECT10109_1b	TRUE	FALSE	b
+ABQ	DBVPG1788_1b	TRUE	FALSE	a
+ABR	DBVPG1794_1b	TRUE	FALSE	b
+ABS	DBVPG3591_1b	TRUE	FALSE	b
+ABT	DBVPG4651_1b	TRUE	FALSE	b
+ACB	TL229S2.2	TRUE	TRUE	b
+ACC	YPS1000_1b	TRUE	FALSE	b
+ACD	YPS163_1b	TRUE	FALSE	b
+ACF	CLIB294_1b	TRUE	TRUE	b
+ACG	CLIB413_1b	TRUE	FALSE	b
+ACH	CLIB483_1b	TRUE	FALSE	b
+ACK	Y12_1b	TRUE	FALSE	b
+ACL	Y3_1b	TRUE	TRUE	b
+ACM	Y9_4	TRUE	TRUE	b
+ACP	CLIB154_1b	TRUE	FALSE	diploid
+ACQ	CLIB219_2b	TRUE	FALSE	b
+ACR	DBVPG1339_1b	TRUE	FALSE	b
+ACS	I14_1b	TRUE	FALSE	b
+ACT	UC8_1b	TRUE	FALSE	b
+ACV	WE372_1b	TRUE	FALSE	b
+ADA	Y55_1b	TRUE	FALSE	b
+ADC	UC1_1b	TRUE	FALSE	a
+ADD	IL_01_b	TRUE	FALSE	b
+ADE	PW5_b	TRUE	FALSE	a
+ADF	YPS1009_b	TRUE	FALSE	b
+ADG	NC_02_b	TRUE	FALSE	b
+ADH	T7_b	TRUE	FALSE	diploid
+ADI	YJM981_b	TRUE	TRUE	b
+ADN	K1_1	TRUE	TRUE	a
+ADQ	K12_2	TRUE	TRUE	NA
+ADR	M22_1b	TRUE	FALSE	b
+ADT	CBS7765	TRUE	TRUE	b
+ADV	CBS7903	TRUE	TRUE	b
+AEA	CBS7958	TRUE	TRUE	b
+AEF	CBS6414	TRUE	TRUE	b
+AEG	CBS7962	TRUE	TRUE	a
+AEH	CBS7964	TRUE	FALSE	a
+AEI	CBS1428	TRUE	TRUE	a
+AAE	CBS2806a	TRUE	TRUE	diploid
+AEM	CBS2973	TRUE	TRUE	b
+AEQ	CBS1782	TRUE	TRUE	b
+AER	CBS2970	TRUE	TRUE	a
+AES	CBS4054	TRUE	TRUE	diploid
+AFB	CBS7371	TRUE	TRUE	a
+AFD	CBS7960	TRUE	TRUE	a
+AFF	CBS1252	TRUE	TRUE	a
+AFG	CBS1387	TRUE	TRUE	a
+AFH	CBS1509	TRUE	TRUE	a
+AFM	CBS6412	TRUE	TRUE	b
+AFN	CBS6413	TRUE	TRUE	a
+AFQ	CBS7993	TRUE	TRUE	a
+AFR	CBS7959	TRUE	TRUE	a
+AGC	CBS2444	TRUE	TRUE	b
+AGF	CBS1479	FALSE	TRUE	a
+AGK	CBS2361	TRUE	TRUE	diploid
+AGM	CBS7961	FALSE	TRUE	a
+AGN	CBS439	FALSE	TRUE	a
+AGP	CBS1544	TRUE	TRUE	a
+AGR	CBS1594	FALSE	TRUE	a
+AGS	CBS3013	FALSE	TRUE	a
+AGT	CBS3078	FALSE	TRUE	a
+AGV	CBS6223	FALSE	TRUE	a
+AHA	CBS6333	FALSE	TRUE	a
+AHB	CBS4734	FALSE	TRUE	a
+AHC	CBS7963	FALSE	TRUE	a
+AAG	CBS428a	TRUE	FALSE	a
+AHD	CBS1192	FALSE	TRUE	a
+AHE	CBS1194	FALSE	FALSE	b
+AHF	CBS1540	FALSE	TRUE	a
+AHG	CBS1586	FALSE	FALSE	a
+AHH	CBS3000	FALSE	TRUE	a
+AHI	CBS6914	FALSE	TRUE	a
+AHK	CBS2247	FALSE	FALSE	a
+AHL	CBS3081	FALSE	FALSE	a
+AHM	CBS3093	FALSE	TRUE	a
+AAK	CBS4093a	FALSE	TRUE	a
+AHN	CBS5635	FALSE	TRUE	diploid
+AHQ	CBS440	FALSE	TRUE	a
+AHR	CBS1227	TRUE	TRUE	a
+AHS	CBS1419	TRUE	TRUE	diploid
+AHT	CBS1460	FALSE	TRUE	a
+AHV	CBS1487	FALSE	TRUE	a
+AIA	CBS2180	FALSE	FALSE	a
+AIB	CBS2805	TRUE	FALSE	b
+AIE	CBS2910	FALSE	TRUE	a
+BCN	HE015	TRUE	TRUE	a
+BIQ	DBVPG1126	TRUE	TRUE	NA
+CDA	S8BM-32-4D(a)	TRUE	TRUE	NA
+CDK	CCY_21-4-93:6B	TRUE	TRUE	a
+CEA	DBVPG1617-5A	TRUE	TRUE	a
+CEB	DBVPG1619-4B	TRUE	FALSE	NA
+CEM	CCY_21-4-89:7-3	TRUE	TRUE	a
+CEV	IFO_0289:4-3(b)	TRUE	FALSE	b
+BRL	DBVPG6350	TRUE	TRUE	b
+BRM	DBVPG6590	TRUE	TRUE	b
+CBK	1	TRUE	TRUE	NA
+CLQ	UC5	TRUE	TRUE	a
