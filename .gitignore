@@ -14,3 +14,6 @@ chr*.tsv
 *.good.txt
 *.bad.txt
 .vscode/
+slurm*out
+*.assembled.fasta
+
