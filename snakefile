@@ -16,7 +16,7 @@ def wrap_fasta(seq, line_length=80):
 rule targets:
     """Defines the set of files desired at end of pipeline"""
     input:
-        expand("data/processed/{batch}-{sample}-{gene}.aln", batch=BATCH, sample=SAMPLES, gene=GENES)
+        expand("data/processed/{batch}-{sample}-{gene}.counts", batch=BATCH, sample=SAMPLES, gene=GENES + ['nomatch'])
         #expand("data/processed/{batch}-{sample}-{gene}.fa", batch=BATCH, sample=SAMPLES, gene=GENES)
         #expand("data/processed/{batch}-{sample}-summary.txt", batch=BATCH, sample=SAMPLES)
         #expand("data/processed/{batch}-{sample}-{gene}.txt", batch=BATCH, sample=SAMPLES, gene=GENES)
@@ -27,7 +27,8 @@ rule make_fastas:
     threads: 1
     resources:
         mem_mb = 1024*1,
-        runtime_min = 5
+        runtime_min = 5,
+        log_filename = "logs/{rule}-%j-{gene}.out"
     run:
         for gene in GENES:
             seq = ''.join([config['amplicons'][gene][i] for i in ['upstream','wt','downstream']])
@@ -47,7 +48,8 @@ rule get_reads:
     threads: 1
     resources:
         mem_mb = 1024*1,
-        runtime_min = 5
+        runtime_min = 5,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     params:
         filename1 = lambda wc: samples.loc[wc.sample, 'filename1'],
         filename2 = lambda wc: samples.loc[wc.sample, 'filename2'],
@@ -62,8 +64,6 @@ rule get_reads:
         wget -O data/input/{params.filename2} https://onedrive.live.com/download?cid={params.ida}\\&resid={params.ida}%{params.idb2}\&authkey={params.idc2}
         """
 
-# snakemake -j 8 --latency-wait=180 --cluster="sbatch -c {threads} --mem={resources.mem_mb} --time={resources.runtime_min}"
-
 rule pair_with_pear:
     """Assembles forward and reverse read pair into single overlapping read"""
     input:
@@ -77,7 +77,8 @@ rule pair_with_pear:
     threads: 2
     resources:
         mem_mb = 1024*4,
-        runtime_min = 60*2
+        runtime_min = 60*2,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     container: "library://wellerca/pseudodiploidy/mapping:latest"
     shell:
         """
@@ -93,7 +94,8 @@ rule get_read_set_counts:
     threads: 1
     resources:
         mem_mb = 1024*4,
-        runtime_min = 10
+        runtime_min = 10,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     shell:
         """
         bash src/get_read_set_counts {input} > {output}
@@ -103,11 +105,12 @@ rule assess_reads:
     input: 
         "data/processed/{batch}-{sample}.assembled.fastq.counts"
     output:
-        temp(expand("data/processed/{{batch}}-{{sample}}-{gene}.counts", gene=GENES + ['nomatch']))
+        expand("data/processed/{{batch}}-{{sample}}-{gene}.counts", gene=GENES + ['nomatch'])
     threads: 1
     resources:
         mem_mb = 1024*4,
-        runtime_min = 60
+        runtime_min = 60,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     shell:
         """
         python src/analyze_sim_reads.py {input}
@@ -121,7 +124,8 @@ rule convert_to_fasta:
     threads: 1
     resources:
         mem_mb = 1024*2,
-        runtime_min = 10
+        runtime_min = 10,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}-{gene}.out"
     shell:
         """
         bash src/convert_to_fasta.sh {input} > {output}
@@ -136,22 +140,15 @@ rule align:
     threads: 1
     resources:
         mem_mb = 1024*4,
-        runtime_min = 60
+        runtime_min = 180,
+        log_filename = "logs/{rule}-%j-{batch}-{sample}-{gene}.out"
     shell:
         """
-        cat {input.wt} {input.seqs} | src/clustalo -i - -o {output} 
+        # If input sequence file is not empty
+        if [ -s {input.seqs} ]; then                                    
+            cat {input.wt} {input.seqs} | src/clustalo -i - -o {output}
+        else;
+            echo {input.seqs} is empty! Nothing to align
+            touch {output}
+        fi
         """
-
-# rule process_gene_stats:
-#     input:
-#         expand("data/processed/{{batch}}-{{sample}}-{gene}.aln", gene=GENES)
-#     output:
-#         "data/processed/{batch}-{sample}-summary.txt"
-#     threads: 1
-#     resources:
-#         mem_mb = 1024*3,
-#         runtime_min = 10
-#     shell:
-#         """
-#         touch {output}
-#         """

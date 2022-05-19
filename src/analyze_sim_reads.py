@@ -63,16 +63,6 @@ def check_pythonpath():
         )
 
 
-# def match_sequence_perfect(seq, amplicons):
-#     '''returns array for whether or not the given seqs match any patterns'''
-#     output = []
-#     for i in amplicons:
-#         if re.search(i.regex_pattern1, seq):
-#             output.append(i.name)
-#     if len(output) > 0:
-#         return output
-#     return None
-
 def match_sequence_fuzzy(seq, amplicons):
     '''returns array for whether or not the given seqs match any patterns'''
     for amplicon in amplicons:
@@ -81,6 +71,11 @@ def match_sequence_fuzzy(seq, amplicons):
                 return amplicon.name
     return None
 
+def assign_sequence(seq, match, amplicons):
+    '''assigns sequencing read (seq) corresponding to amplicon (match) as wt or edit'''
+    for amplicon in amplicons:
+        if amplicon.name == match:
+            return amplicon.classify_read(seq)
 
 class Amplicon:
     '''describes information in config.yaml for identifying various sequenced amplicons'''
@@ -92,20 +87,35 @@ class Amplicon:
                 edit,
                 pad_left,
                 pad_right,
-                max_errors
+                max_errors,
+                cut_site,
+                dist_around_edit
     ):
         self.name = name
         self.upstream = upstream
         self.downstream = downstream
         self.wt = wt
         self.edit = edit
+        self.dist_around_edit = dist_around_edit
         self.seq = self.upstream[pad_left : -pad_right]
         self.patterns = [re.compile(fr"({self.seq}){{e<={error}}}") for error in max_errors]
+        self.cut_site = cut_site
+        self.slice = slice(self.cut_site - self.dist_around_edit, 
+                           self.cut_site + self.dist_around_edit)
+        self.wt_seq = (self.upstream + self.wt + self.downstream)[self.slice]
+        self.edit_seq = (self.upstream + self.edit + self.downstream)[self.slice]
+    def classify_read(self, read):
+        if self.edit_seq in read:
+            return 'edit'
+        if self.wt_seq in read:
+            return 'wt'
+        else:
+            return 'other'
 
 
 def main():
     '''Main'''
-    startTime = time.time()
+    start_time = time.time()
     config = yaml_load('config.yaml')
 
     # Initialize logging
@@ -139,20 +149,25 @@ def main():
     gene_names = list(config['amplicons'].keys())
     amplicons = []
     for gene in gene_names:
-        amplicon = Amplicon(gene,
-                    config['amplicons'][gene]['upstream'],
-                    config['amplicons'][gene]['downstream'],
-                    config['amplicons'][gene]['wt'],
-                    config['amplicons'][gene]['edit'],
-                    config['pad_left'],
-                    config['pad_right'],
-                    {int(len(config['amplicons'][gene]['upstream'])*i) for i in mismatch_tolerances}
+        amplicon = Amplicon(name = gene,
+                    upstream = config['amplicons'][gene]['upstream'],
+                    downstream = config['amplicons'][gene]['downstream'],
+                    wt = config['amplicons'][gene]['wt'],
+                    edit = config['amplicons'][gene]['edit'],
+                    pad_left = config['pad_left'],
+                    pad_right = config['pad_right'],
+                    max_errors={int(len(config['amplicons'][gene]['upstream'])*i) for i in mismatch_tolerances},
+                    cut_site = config['amplicons'][gene]['cut_site'],
+                    dist_around_edit = config['dist_around_edit']
         )
         amplicons.append(amplicon)
 
     for amplicon in amplicons:
         logger.info("adding amplicon: %s", amplicon.name)
         logger.info("adding perfect match pattern: %s", amplicon.patterns)
+        logger.info("distance around cut site considered: %s", amplicon.dist_around_edit)
+        logger.info("sequence diagnostic of wild type: %s", amplicon.wt_seq)
+        logger.info("sequence diagnostic of edit: %s", amplicon.edit_seq)
 
     # Evaluate reads
 
@@ -172,11 +187,13 @@ def main():
                 logger.info("%s reads done", i)
             count, seq = line.strip().split()
             match = match_sequence_fuzzy(seq, amplicons)
-            # here
             if match is None:
                 match = 'nomatch'
-            print(f"{count}\t{seq}", file=files[match])
-    run_time = (time.time() - startTime)
+                read_classification = 'other'
+            else:
+                read_classification = assign_sequence(seq, match, amplicons)
+            print(f"{count}\t{read_classification}\t{seq}", file=files[match])
+    run_time = (time.time() - start_time)
     logger.info("Total runtime: %s", run_time)
     sys.exit()
 
