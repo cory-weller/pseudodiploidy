@@ -28,7 +28,6 @@ rule make_fastas:
     resources:
         mem_mb = 1024*1,
         runtime_min = 5,
-        log_filename = "logs/{rule}-%j-{gene}.out"
     run:
         for gene in GENES:
             seq = ''.join([config['amplicons'][gene][i] for i in ['upstream','wt','downstream']])
@@ -49,7 +48,6 @@ rule get_reads:
     resources:
         mem_mb = 1024*1,
         runtime_min = 5,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     params:
         filename1 = lambda wc: samples.loc[wc.sample, 'filename1'],
         filename2 = lambda wc: samples.loc[wc.sample, 'filename2'],
@@ -78,7 +76,6 @@ rule pair_with_pear:
     resources:
         mem_mb = 1024*4,
         runtime_min = 60*2,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     container: "library://wellerca/pseudodiploidy/mapping:latest"
     shell:
         """
@@ -95,7 +92,6 @@ rule get_read_set_counts:
     resources:
         mem_mb = 1024*4,
         runtime_min = 10,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     shell:
         """
         bash src/get_read_set_counts {input} > {output}
@@ -110,7 +106,6 @@ rule assess_reads:
     resources:
         mem_mb = 1024*4,
         runtime_min = 60,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}.out"
     shell:
         """
         python src/analyze_sim_reads.py {input}
@@ -125,7 +120,6 @@ rule convert_to_fasta:
     resources:
         mem_mb = 1024*2,
         runtime_min = 10,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}-{gene}.out"
     shell:
         """
         bash src/convert_to_fasta.sh {input} > {output}
@@ -141,7 +135,6 @@ rule align:
     resources:
         mem_mb = 1024*4,
         runtime_min = 180,
-        log_filename = "logs/{rule}-%j-{batch}-{sample}-{gene}.out"
     shell:
         """
         # If input sequence file is not empty
