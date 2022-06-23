@@ -32,23 +32,31 @@ chromosome=12
 start=171320
 end=172320
 replicates=1
+module load singularity
 
-# Get Hygromycin-sensitive alpha-strains
+# Get Hygromycin-sensitive alpha-strains (pass 1)
 awk 'NR > 1 && $3=="TRUE" && $5=="b" {print $1}' data/processed/strain-info.tsv > data/processed/hyg-sensitive-alpha.txt
 src/query-region.sh data/processed/hyg-sensitive-alpha.txt ${chromosome} ${start} ${end} ${replicates} 
 awk '$4=="b" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/hyg-sensitive-alpha-distinct.txt
 rm reports/chr${chromosome}-${start}-${end}.tsv
 
-# Get G418-sensitive a-strains
+# Get G418-sensitive a-strains (pass 1)
 awk 'NR > 1 && $4=="TRUE" && $5=="a" {print $1}' data/processed/strain-info.tsv > data/processed/G418-sensitive-a.txt
 src/query-region.sh data/processed/G418-sensitive-a.txt ${chromosome} ${start} ${end} ${replicates} 
 awk '$4=="a" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/G418-sensitive-a-distinct.txt
 rm reports/chr${chromosome}-${start}-${end}.tsv
 
-## Remove following?
-# get strains for first pass
-# src/query-region.sh data/input/strains-to-start-with.txt ${chromosome} ${start} ${end} ${replicates} && \
-# mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.firstpass.tsv
+# Do pass 2
+src/get-second-pass-strains.py data/processed/hyg-sensitive-alpha.txt data/processed/hyg-sensitive-alpha-distinct.txt > data/processed/hyg-sensitive-alpha-pool2.txt
+src/query-region.sh data/processed/hyg-sensitive-alpha-pool2.txt ${chromosome} ${start} ${end} ${replicates} 
+awk '$4=="b" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/hyg-sensitive-alpha-pool2.txt
+rm reports/chr${chromosome}-${start}-${end}.tsv
+
+src/get-second-pass-strains.py data/processed/G418-sensitive-a.txt data/processed/G418-sensitive-a-distinct.txt > data/processed/G418-sensitive-a-pool2.txt
+src/query-region.sh data/processed/G418-sensitive-a-pool2.txt ${chromosome} ${start} ${end} ${replicates} 
+awk '$4=="a" {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | tr ',' '\n' > data/processed/G418-sensitive-a-pool2.txt
+rm reports/chr${chromosome}-${start}-${end}.tsv
+
 
 # extract strains identified in the first pass
 
@@ -75,34 +83,34 @@ bash src/print-region-to-file.sh 2 80000 81000
 ## Transform data
 ```
 # Build count matrix for DESeq
-singularity exec --bind $(pwd -P) src/R.sif Rscript \
+singularity exec --bind $(readlink ~/pseudodiploidy) src/R.sif Rscript \
     src/build-count-matrix.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/featurecounts-matrix.RDS
 
 # Build TPM table for other analyses
-singularity exec --bind $(pwd -P) src/R.sif Rscript \
+singularity exec --bind $(readlink ~/pseudodiploidy) src/R.sif Rscript \
     src/build-TPM-table.R \
     data/input/combined-featurecounts.csv \
     data/input/samples.csv \
     data/processed/TPM.txt.gz
 
 # Build DESeq Data Set (DDS) Object
-singularity exec --bind $(pwd -P) src/R.sif Rscript \
+singularity exec --bind $(readlink ~/pseudodiploidy) src/R.sif Rscript \
     src/build-DDS.R \
     data/processed/featurecounts-matrix.RDS \
     data/input/samples.csv \
     data/processed/DDS.RDS
 
 # Run differential expression contrasts
-singularity exec --bind $(pwd -P) src/R.sif Rscript \
+singularity exec --bind $(readlink ~/pseudodiploidy) src/R.sif Rscript \
     src/run-contrast.R
 ```
 
 # Run exploratory analyses
 ```
-singularity exec --bind $(pwd -P) src/R.sif R
+singularity exec --bind $(readlink ~/pseudodiploidy) src/R.sif R
 ```
 
 # 1011-barcodes
@@ -174,21 +182,38 @@ head -n 138738 data/external/S288C_reference_sequence_R64-3-1_20210421.fsa | tai
 ```
 chr12:171320-172320
 
-# look at guides across whole pool
+# look at guides across whole pool, first pass
 cat data/processed/hyg-sensitive-alpha-distinct.txt data/processed/G418-sensitive-a-distinct.txt | sort -u > data/processed/pooled-distinct-strains.txt
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/pooled-distinct-strains.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-variable-sites.txt
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-variable-sites.txt $start $end
 
-# Try again excluding ADD, ABI, AGV:
-grep -v "ADD" data/processed/pooled-distinct-strains.txt | grep -v "ABI" | grep -v "AGV > data/processed/pooled-strains-minus-ADD-ABI-AGV
+singularity exec --bind $(readlink ~/pseudodiploidy) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/pooled-distinct-strains.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-variable-sites.txt
+
+singularity exec --bind $(readlink ~/pseudodiploidy) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-variable-sites.txt $start $end
 
 
-# look at guides for separate pools
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/hyg-sensitive-alpha-distinct.txt ${chromosome} ${start} ${end} > data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/hyg-sensitive-alpha-distinct-variable-sites.txt $start $end
+# same as above, but with second pool added
+cat data/processed/G418-sensitive-a-pool2.txt data/processed/hyg-sensitive-alpha-pool2.txt data/processed/G418-sensitive-a-distinct.txt data/processed/hyg-sensitive-alpha-distinct.txt | sort -u > data/processed/double-pool-distinct.txt
 
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/G418-sensitive-a-distinct.txt ${chromosome} ${start} ${end} > data/processed/G418-sensitive-a-distinct-variable-sites.txt
-singularity exec --bind $(pwd -P) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/G418-sensitive-a-distinct-variable-sites.txt $start $end
+singularity exec --bind $(readlink ~/pseudodiploidy) src/pseudodiploidy.sif Rscript src/get-variable-sites.R data/external/chromosome12.vcf.gz data/processed/double-pool-distinct.txt ${chromosome} ${start} ${end} > data/processed/pooled-distinct-strains-pool2-variable-sites.txt
+
+singularity exec --bind $(readlink ~/pseudodiploidy) src/pseudodiploidy.sif Rscript src/get-usable-guides.R data/processed/chr12-guides.tsv data/processed/pooled-distinct-strains-pool2-variable-sites.txt $start $end
+
+```R
+library(data.table)
+dat <- fread('data/external/chromosome12.vcf.gz')
+
+start <- 171320
+stop <- 172320
+
+headerNames <- colnames(fread('data/input/vcf-header.txt', header=TRUE))
+setnames(dat, headerNames)
+
+usedStrains <- fread('data/processed/double-pool-distinct.txt', header=FALSE)$V1
+usedStrains <- usedStrains[usedStrains!="S288C"]
+setnames(dat, "#CHROM", "CHROM")
+
+dat.sub <- dat[, c("CHROM", "POS", "REF", "ALT", usedStrains), with=FALSE][POS >= start & POS <= stop]
+dat.sub[POS==171721]
+```
 
 # Looking at illumina seq data may 4 2022
 Retrieve reads from nih box:
@@ -207,3 +232,19 @@ rm data/processed/sample8.{discarded,unassembled.forward,unassembled.reverse}.fa
 gzip data/processed/sample8.assembled.fastq
 ```
 
+# Making downsized VCF within window of interest
+```R
+library(data.table)
+start <- 171320
+end <- 172320
+vcf <- fread('data/external/chromosome12.vcf.gz')
+header <- colnames(fread('data/input/vcf-header.txt'))
+setnames(dat, header)
+strains <- fread('data/external/mating-types.tsv')[,Standardized_name]
+wanted_cols <- c(header[1:9], strains)
+
+vcf_window <- vcf[, ..wanted_cols][, !c("ID","QUAL","INFO","FILTER","FORMAT")][POS %between% c(start, end)]
+
+fwrite(vcf_window, file='data/processed/window_genotypes.vcf', quote=F, row.names=F, col.names=T, sep='\t')
+
+```

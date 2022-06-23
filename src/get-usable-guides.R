@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 options(width=900)
 args <- commandArgs(trailingOnly=TRUE)
-#args <- c('data/processed/chr12-guides.tsv', 'data/processed/pooled-distinct-strains-variable-sites.txt', '171320', '172320')
 library(data.table)
 
 allGuides <- fread(args[1], header=F)

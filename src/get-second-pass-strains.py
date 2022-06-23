@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 
-with open('data/input/strains-to-start-with.txt', 'r') as infile:
+import sys
+
+starting_strain_file = sys.argv[1]
+used_strains_file = sys.argv[2]
+
+with open(starting_strain_file, 'r', encoding='utf-8') as infile:
     startStrains = [x.strip() for x in infile.readlines()]
 
-with open('data/input/first-pass-strains.txt', 'r') as infile:
+with open(used_strains_file, 'r', encoding='utf-8') as infile:
     usedStrains = [x.strip() for x in infile.readlines()]
 
 strainsForSecondPass = [x for x in startStrains if x not in usedStrains]
 
-with open('data/input/second-pass-strains.txt', 'w') as outfile:
-    outfile.write('\n'.join(strainsForSecondPass))
+for i in strainsForSecondPass:
+    print(i)
