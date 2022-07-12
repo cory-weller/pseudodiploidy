@@ -23,14 +23,109 @@ module load singularity
 bash src/get-data.sh
 ```
 
+
+
+
+```bash
+awk '$5=="a" {print $1}' data/processed/strain-info.tsv > data/input/type-a-strains.txt
+awk '$5=="b" {print $1}' data/processed/strain-info.tsv > data/input/type-b-strains.txt
+cat data/input/type-a-strains.txt data/input/type-b-strains.txt > data/input/haploid-strains.txt
+# src/query-region.sh data/processed/hyg-sensitive-alpha.txt ${chromosome} ${start} ${end} ${replicates} 
+module load singularity
+
+src/query-region.sh data/input/haploid-strains.txt 12 171320 172320 1
+
+
+#src/query-region.sh data/input/haploid-strains.txt 1 73288 75043 10
+chromosome=1
+for i in $(seq 71786 100 76152); do 
+    start=$i
+    let end=$i+999
+    src/query-region.sh data/input/haploid-strains.txt $chromosome $start $end 1
+done
+
+
+#src/query-region.sh data/input/haploid-strains.txt 16 619014 620425 1
+chromosome=16
+for i in $(seq 615379 100 621258); do 
+    start=$i
+    let end=$i+999
+    src/query-region.sh data/input/haploid-strains.txt $chromosome $start $end 1
+done
+
+#src/query-region.sh data/input/haploid-strains.txt 7 989419 991176 1
+chromosome=7
+for i in $(seq 988049 100 993521); do 
+    start=$i
+    let end=$i+999
+    src/query-region.sh data/input/haploid-strains.txt $chromosome $start $end 1
+done
+
+chromosome=2
+for i in $(seq 136688 100 140260); do 
+    start=$i
+    let end=$i+999
+    src/query-region.sh data/input/haploid-strains.txt $chromosome $start $end 1
+done
+```
+
+```R
+#!/usr/bin/env Rscript
+
+library(data.table)
+library(foreach)
+
+setwd("reports/")
+o <- foreach(filename = list.files(pattern="*.tsv"), .combine='rbind') %do% {
+    fread(filename)
+}
+
+
+library(ggplot2)
+
+dat.ag <- o[,list(N=sum(n.strains)), by=list(start,chromosome)]
+dat.ag[chromosome==1]
+ggplot(data=dat.ag, aes(x=start, y=N)) + geom_point() + facet_wrap(chromosome~., scales='free') +
+labs(x='window start position')
+```
+
 ## Check windows for strain uniqueness for first and second pass
+```bash
+# for each of the following sets of parameters...
+chromosome=1; start=73986; end=74985; replicates=1
+chromosome=2; start=137288; end=138287; replicates=1
+chromosome=7; start=988749; end=989748; replicates=1
+chromosome=16; start=618979; end=619978; replicates=1
+
+# Run this block:
+
+awk 'NR==2 {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | sed 's/,/\n/g' | awk 'NR > 1' > data/input/${chromosome}-${start}-${end}-firstpass.txt
+awk 'NR==3 {print $6}' reports/chr${chromosome}-${start}-${end}.tsv | sed 's/,/\n/g' | awk 'NR > 1' >> data/input/${chromosome}-${start}-${end}-firstpass.txt
+
+mkdir -p reports/chosen/
+cat reports/chr${chromosome}-${start}-${end}.tsv > reports/chosen/chr${chromosome}-${start}-${end}.first.tsv
+
+python3 src/get-second-pass-strains.py data/input/haploid-strains.txt data/input/${chromosome}-${start}-${end}-firstpass.txt > data/input/${chromosome}-${start}-${end}-secondpass-start.txt
+src/query-region.sh data/input/${chromosome}-${start}-${end}-secondpass-start.txt ${chromosome} ${start} ${end} ${replicates}
+mv reports/chr${chromosome}-${start}-${end}.tsv reports/chosen/chr${chromosome}-${start}-${end}.second.tsv
+
+```
+
+# extract strains identified in the first pass
+
+# awk 'NR==2 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' > data/input/first-pass-strains.txt
+# awk 'NR==3 {print $6}' reports/chr12-171320-172320.firstpass.tsv | sed 's/,/\n/g' | awk 'NR > 1' >> data/input/first-pass-strains.txt
+
+# python3 src/get-second-pass-strains.py
+
+# src/query-region.sh data/input/second-pass-strains.txt ${chromosome} ${start} ${end} ${replicates} && \
+# mv reports/chr${chromosome}-${start}-${end}.tsv reports/chr${chromosome}-${start}-${end}.secondpass.tsv
+
 ```bash
 # edit data/input/strains-to-start-with.txt
 # which includes the starting set of possible strains to consider
 
-chromosome=12
-start=171320
-end=172320
+
 replicates=1
 module load singularity
 
