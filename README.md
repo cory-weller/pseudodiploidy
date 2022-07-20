@@ -24,6 +24,10 @@ bash src/get-data.sh
 ```
 
 
+## Find all guide sequences in S288C genome
+sed -r 's/>.*genomic\] \[[a-z]+=([^]]+?)].*$/>chr\1/g' \
+./data/external/S288C_reference_sequence_R64-3-1_20210421.fsa | \
+src/find_guides.py > data/processed/S288C_guides.tsv
 
 
 ```bash
