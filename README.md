@@ -112,7 +112,6 @@ cat reports/chr${chromosome}-${start}-${end}.tsv > reports/chosen/chr${chromosom
 python3 src/get-second-pass-strains.py data/input/haploid-strains.txt data/input/${chromosome}-${start}-${end}-firstpass.txt > data/input/${chromosome}-${start}-${end}-secondpass-start.txt
 src/query-region.sh data/input/${chromosome}-${start}-${end}-secondpass-start.txt ${chromosome} ${start} ${end} ${replicates}
 mv reports/chr${chromosome}-${start}-${end}.tsv reports/chosen/chr${chromosome}-${start}-${end}.second.tsv
-
 ```
 
 # extract strains identified in the first pass
