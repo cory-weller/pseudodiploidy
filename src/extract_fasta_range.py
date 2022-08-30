@@ -54,9 +54,12 @@ else:
     header_pattern = args.header_search + r"[^IVX]+"
     header_pattern = re.compile(header_pattern)
 
+# format header
 fasta_filename = args.fasta.split("/")[-1]
 out_header = re.split('.fasta|.fa|.fsa', fasta_filename)[0]
-out_header += '_' + args.header_search +':'+ str(args.start) + '-' + str(args.stop)
+if args.header_search:
+    out_header += '_' + args.header_search
+out_header += ':'+ str(args.start) + '-' + str(args.stop)
 
 out_seq = ''
 store_seq = False
