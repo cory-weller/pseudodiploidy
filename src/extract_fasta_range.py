@@ -9,6 +9,17 @@ def wrap_fasta(seq):
     '''wraps sequence every 80 characters with newlines'''
     return '\n'.join([seq[x:x+80] for x in range(0,len(seq),80)])
 
+def revcomp(seq):
+    '''returns reverse complement of given sequence'''
+    seq = seq.upper()
+    pairs = {
+        "A" : "T",
+        "T" : "A",
+        "C" : "G",
+        "G" : "C"
+    }
+    return ''.join([pairs[x] for x in seq[::-1]])
+
 parser = argparse.ArgumentParser()
 parser.add_argument('fasta', type=str,
                     help="""
@@ -47,6 +58,7 @@ parser.add_argument('--header-output',
 
 
 args = parser.parse_args()
+start, stop = sorted([args.start, args.stop])
 
 if args.header_search is None:
     header_pattern = '>'
@@ -59,7 +71,7 @@ fasta_filename = args.fasta.split("/")[-1]
 out_header = re.split('.fasta|.fa|.fsa', fasta_filename)[0]
 if args.header_search:
     out_header += '_' + args.header_search
-out_header += ':'+ str(args.start) + '-' + str(args.stop)
+out_header += ':'+ str(start) + '-' + str(stop)
 
 out_seq = ''
 store_seq = False
@@ -91,8 +103,9 @@ if len(out_seq) == 0:
     print("seq is of length 0")
     sys.exit()
 
-wanted_region = out_seq[(args.start-1) : args.stop]
-
+wanted_region = out_seq[(start-1) : stop]
+if args.start > args.stop:
+    wanted_region = revcomp(wanted_region)
 
 if len(wanted_region) == 0:
     print("extracted region is of length 0")

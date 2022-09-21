@@ -17,6 +17,7 @@ def import_vcf_header(vcf_filename, header_filename=None):
     external_header = None
     if header_filename:
         with open(header_filename, 'r', encoding='utf-8') as infile:
+            print(f'Importing header from file {header_filename}')
             external_header = infile.read().strip().split()
     with gzip.open(vcf_filename) as infile:
         firstline = infile.readline().decode()
@@ -30,26 +31,44 @@ def import_vcf_header(vcf_filename, header_filename=None):
     if external_header and not vcf_header:
         return external_header
 
+def gopen(filename):
+    '''Generator that iterates through a file whether gzipped or not'''
+    if filename.endswith('.gz'):
+        open_fn = gzip.open
+    else:
+        open_fn = open
+    with open_fn(filename, 'r') as infile:
+        for line in infile:
+            try:
+                line = line.decode()
+            except(UnicodeDecodeError, AttributeError):
+                pass
+            yield line
 
 
 def subset_vcf(filename, chrom, start, stop, col_indices):
     '''loads in VCF for given chromosome, start/stop indices, for provided strains.
         Strains can be provided as list (loaded from file with --strains-file)'''
-    with gzip.open(filename) as infile:
-        for line in infile:
-            line = line.decode()
-            splitline = line.strip().split()
-            if line.startswith('#') and header is None:
-                continue
-            chrom, pos = splitline[0:2]
-            pos = int(pos)
-            if pos < start:
-                continue
-            if pos > stop:
-                break
-            if pos >= start:
-                yield [pos] + [set([splitline[x] for x in col_indices])]
+    for line in gopen(filename):
+        splitline = line.strip().split()
+        if line.startswith('#') and header is None:
+            continue
+        chrom, pos = splitline[0:2]
+        pos = int(pos)
+        if pos < start:
+            continue
+        if pos > stop:
+            break
+        if pos >= start:
+            yield [pos] + [splitline[x] for x in col_indices]
 
+def as_string(*args, sep='\t'):
+    '''converts multiple arguments to string, separated by <sep> (default of \t)'''
+    return sep.join([str(x) for x in args])
+
+def list_to_string(i, sep='\t'):
+    '''converts list to string, separated by <sep> (default of \t)'''
+    return sep.join([str(x) for x in i])
 
 def extract_fasta(fasta_filename, start, stop, strip_header=False, header_search=None):
     '''returns given start/stop range for provided fasta file'''
@@ -68,24 +87,17 @@ def extract_fasta(fasta_filename, start, stop, strip_header=False, header_search
 def get_fasta(filename, text_string='>'):
     '''returns the first entry in the fasta file that matches the provided text_string.
     If no text_string is provided, the first fasta entry will be used.'''
-    if filename.endswith('.gz'):
-        open_fn = gzip.open
-    else:
-        open_fn = open
     found = False
-    with open_fn(filename, 'r') as infile:
-        for line in infile:
-            try:
-                line = line.decode()
-            except(UnicodeDecodeError, AttributeError):
-                pass
-            if found:
-                if line.startswith('>') and text_string not in line:
-                    break
-                yield line
-            if text_string in line:
-                found = True
-                yield line
+    for line in gopen(filename):
+        if found:
+            if line.startswith('>') and text_string not in line:
+                break
+            yield line
+        if text_string in line:
+            found = True
+            yield line
+
+
 
 
 def format_fasta(fasta):
@@ -118,13 +130,13 @@ class guide:
         self.strand = strand
         if strand == '+':
             self.start = match.span()[0] + 1 + self.offset
-            self.stop = (self.start + 19) + self.offset
+            self.stop = (self.start + 19)
             self.seq = match.group(0)
             self.pam = self.seq[-3:]
             self.seq = self.seq[:20]
         elif strand == '-':
             self.start = match.span()[1] + self.offset
-            self.stop = self.start - 19 + self.offset
+            self.stop = self.start - 19
             self.seq = revcomp(match.group(0))
             self.pam = self.seq[-3:]
             self.seq = self.seq[:20]
@@ -155,6 +167,12 @@ parser.add_argument('--vcf', type=str,
                     required = True,
                     help="""
                         Filename for VCF file
+                    """
+                    )
+parser.add_argument('--out', type=str,
+                    required = True,
+                    help="""
+                        filename (with or without absolute or relative path) for output files
                     """
                     )
 parser.add_argument('--chrom', type=str,
@@ -210,15 +228,28 @@ parser.add_argument('--strains-file',
                         Strains (columns) to load in VCF file, one strain per line
                     """
                     )
-
+parser.add_argument('--strains-list',
+                    type=str,
+                    nargs='?',
+                    const=1,
+                    help="""
+                        Comma-separated string of strains to include
+                    """
+                    )
 args = parser.parse_args()
 
+# Import header from VCF itself, or provided filename)
 header = import_vcf_header(args.vcf, args.header_filename)
 
+# Import file name containing strains to use if provided
+# or default to using all strains in VCF file if no file name provided
 if args.strains_file:
+    print(f'Importing header from {args.strains_file}')
     with open(args.strains_file, 'r', encoding='utf-8') as infile:
         strains = infile.readlines()
         strains = [x.strip() for x in strains]
+elif args.strains_list:
+    strains = args.strains_list.strip().split(',')
 else:
     strains = header[9:]
 
@@ -243,14 +274,25 @@ print(f'Header of FASTA entry selected: {fasta_header}')
 
 vcf = subset_vcf(args.vcf, args.chrom, args.start, args.stop, col_indices)
 
-print('Generating alternate fasta for selectd strains...')
+
+print('Generating alternate fasta for selected strains...')
 alt_fasta = list(fasta_seq)
 
-for i in vcf:
-    fixed_index, genotypes = i
-    fixed_index = fixed_index - args.start
-    if genotypes != {'0/0'}:
-        alt_fasta[fixed_index] = 'N'
+with open(f'{args.out}.{args.start}-{args.stop}.variants', 'w', encoding='utf-8') as outfile:
+    #outfile.write('POS\t' + list_to_string(strains) + '\n')
+    for i in vcf:
+        pos = str(i[0])
+        genotypes = i[1:]
+        variant = [strains[j] for j in range(1, len(genotypes)) if genotypes[j] == '1/1']
+        if len(variant) == 0:
+            continue
+        outfile.write(pos +'\t' + str(len(variant)) + '\t' + '\t'.join(variant) + '\n')
+        fixed_index = i[0]
+        genotypes = set(i[1:])
+        fixed_index = fixed_index - args.start
+        if genotypes != {'0/0'}:
+            alt_fasta[fixed_index] = 'N'
+            #outfile.write(list_to_string(i) + '\n')
 
 alt_fasta = ''.join(alt_fasta)
 print('Done generating alternate fasta')
@@ -261,16 +303,50 @@ reverseGuidePattern = re.compile("CC[ACTG][ACTG]{20}")
 
 guides = findGuides(alt_fasta, forwardGuidePattern, reverseGuidePattern, args.start)
 n = 0
-for i in guides:
-    n += 1
-    print(i.seq, i.strand, i.pam, i.start, i.stop, sep='\t')
+with open(f'{args.out}.guides.txt', 'w', encoding='utf-8') as outfile:
+    outfile.write(as_string('guide', 'strand', 'PAM', 'start', 'end') + '\n')    
+    for i in guides:
+        n += 1
+        outfile.write(as_string(i.seq, i.strand, i.pam, i.start, i.stop) +'\n')
 print(f'Done, {n} guides found for {args.header_search} from {args.start}-{args.stop}')
 
 # python src/get_universal_guides.py \
+#     --out chr1 \
 #     --vcf data/external/chromosome1.vcf.gz \
 #     --fasta data/external/S288C_reference_sequence_R64-3-1_20210421.fsa.gz \
-#     --start 10000 \
-#     --stop 10500 \
+#     --start 73986 \
+#     --stop 74985 \
 #     --header-filename data/input/vcf-header.txt \
 #     --header-search "[chromosome=I]" \
 #     --strains-file teststrains.txt
+
+# python src/get_universal_guides.py \
+#     --out chr2 \
+#     --vcf data/external/chromosome2.vcf.gz \
+#     --fasta data/external/S288C_reference_sequence_R64-3-1_20210421.fsa.gz \
+#     --start 137288 \
+#     --stop 138287 \
+#     --header-filename data/input/vcf-header.txt \
+#     --header-search "[chromosome=II]" \
+#     --strains-file teststrains.txt
+
+# python src/get_universal_guides.py \
+#     --out chr7 \
+#     --vcf data/external/chromosome7.vcf.gz \
+#     --fasta data/external/S288C_reference_sequence_R64-3-1_20210421.fsa.gz \
+#     --start 988749 \
+#     --stop 989748 \
+#     --header-filename data/input/vcf-header.txt \
+#     --header-search "[chromosome=VII]" \
+#     --strains-file teststrains.txt
+
+# python src/get_universal_guides.py \
+#     --out chr16 \
+#     --vcf data/external/chromosome16.vcf.gz \
+#     --fasta data/external/S288C_reference_sequence_R64-3-1_20210421.fsa.gz \
+#     --start 618979 \
+#     --stop 619978 \
+#     --header-filename data/input/vcf-header.txt \
+#     --header-search "[chromosome=XVI]" \
+#     --strains-file teststrains.txt
+
